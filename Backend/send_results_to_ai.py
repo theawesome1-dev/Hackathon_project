@@ -11,7 +11,7 @@ from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 from PIL import Image, ImageOps, UnidentifiedImageError
-
+from datetime import date
 
 DEFAULT_API_URL = "https://api.openai.com/v1/chat/completions"
 DEFAULT_MODEL = "gpt-4o-mini"
@@ -100,11 +100,12 @@ def send_to_ai(result: dict[str, Any], prompt: str) -> str:
 
     api_url = os.getenv("AI_API_URL", DEFAULT_API_URL)
     model = os.getenv("AI_MODEL", DEFAULT_MODEL)
+    today = date.today().isoformat()
     result_text = {key: value for key, value in result.items() if key != "image_url"}
     message_content: list[dict[str, Any]] = [
         {
             "type": "text",
-            "text": f"{prompt}\n\nIndividual scraped post result:\n{json.dumps(result_text, ensure_ascii=False, indent=2)}",
+            "text": f"in case you need it, today's date is {today}. {prompt}\n\nIndividual scraped post result:\n{json.dumps(result_text, ensure_ascii=False, indent=2)}",
         }
     ]
     image_url = result.get("image_url")
