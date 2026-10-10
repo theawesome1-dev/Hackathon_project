@@ -40,22 +40,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// List of events to be displayed
 @Composable
 fun MyScreenContent(modifier: Modifier = Modifier) {
     val sampleEvents = listOf(
         Event(id = 1, name = "Hackathon Kickoff", date = "March 30", time = "09:00 AM", location = "Main Hall"),
         Event(id = 2, name = "Coding Sprint", date = "March 30", time = "01:00 PM", location = "Lab 101"),
         Event(id = 3, name = "Project Presentations", date = "March 31", time = "04:00 PM", location = "Auditorium"),
-        Event(id = 4, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 5, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 6, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 7, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 8, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 9, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 10, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 11, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage"),
-        Event(id = 12, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage")
+        Event(id = 4, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage")
     )
 
     EventList(
@@ -64,7 +55,6 @@ fun MyScreenContent(modifier: Modifier = Modifier) {
     )
 }
 
-// Formats the column of events
 @Composable
 fun EventList(
     events: List<Event>,
@@ -134,7 +124,7 @@ fun EventCard(
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     Hackathon_projectTheme {
         MyScreenContent()
     }
