@@ -11,18 +11,41 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Hackathon_project">
+
+        <!-- HomeActivity opens first as the default launcher page -->
         <activity
-            android:name=".MainActivity"
+            android:name=".HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Hackathon_project"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/Theme.Hackathon_project">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity (Active Events) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Hackathon_project"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Inactive Events Activity -->
+        <activity
+            android:name=".InactiveEventsActivity"
+            android:exported="false"
+            android:label="Inactive Events"
+            android:theme="@style/Theme.Hackathon_project" />
+
+        <!-- Accounts Activity -->
+        <activity
+            android:name=".AccountsActivity"
+            android:exported="false"
+            android:label="Accounts"
+            android:theme="@style/Theme.Hackathon_project" />
+
     </application>
 
 </manifest>
