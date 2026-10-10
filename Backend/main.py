@@ -1,16 +1,43 @@
+import json
 import subprocess
 import sys
-from pathlib import Path
+from contextlib import asynccontextmanager
 
-result = subprocess.run([sys.executable, "test_image_caption_link.py"], capture_output=False, text=True)
-if result.returncode != 0:
-    print(f"Error running image to text script: {result.stderr}", file=sys.stderr)
-    sys.exit(result.returncode)
-result = subprocess.run([sys.executable, "send_results_to_ai.py"], capture_output=False, text=True)
-if result.returncode != 0:
-    print(f"Error running send results to AI script: {result.stderr}", file=sys.stderr)
-    sys.exit(result.returncode)
-result = subprocess.run([sys.executable, "toCalendar.py"], capture_output=False, text=True)
-if result.returncode != 0:
-    print(f"Error running toCalendar script: {result.stderr}", file=sys.stderr)
-    sys.exit(result.returncode)
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+
+def run_script(name: str, required: bool = True):
+    result = subprocess.run(
+        [sys.executable, name],
+        capture_output=True,   # needed so result.stderr has content
+        text=True,
+    )
+    print(result.stdout)
+    if result.returncode != 0:
+        print(f"Error running {name}: {result.stderr}", file=sys.stderr)
+        if required:
+            sys.exit(result.returncode)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # runs once when the server starts
+    run_script("test_image_caption_link.py")
+    run_script("send_results_to_ai.py")
+    run_script("toCalendar.py", required=False)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.get("/data")
+def get_data():
+    with open("ai_analysis.json") as f:
+        return JSONResponse(content=json.load(f))
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
