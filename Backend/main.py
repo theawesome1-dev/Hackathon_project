@@ -3,9 +3,10 @@ import subprocess
 import sys
 from contextlib import asynccontextmanager
 
-import uvicorn
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+import uvicorn
 
 
 def run_script(name: str, required: bool = True):

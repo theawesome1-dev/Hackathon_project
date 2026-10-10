@@ -1,2 +1,5 @@
 apify-client>=2.22.2
 Pillow>=10.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+icalendar>=6.1.0

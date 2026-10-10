@@ -5,10 +5,10 @@ BEGIN:VEVENT
 SUMMARY:Campus Yard Sale
 DTSTART;TZID="UTC-04:00":20261013T120000
 DTEND;TZID="UTC-04:00":20261013T150000
-DESCRIPTION:Join us for the annual Campus Yard Sale at UCF! Meet amazing s
- tudent-run organizations and learn more about what they offer while enjoyi
- ng free goodies and apple cider at the CAB table. Don't miss this chance t
- o connect with fellow students and grab some merchandise!
+DESCRIPTION:Join us for the annual Campus Yard Sale at UCF! Meet amazing r
+ egistered student organizations and grab some free goodies while supplies 
+ last\, including apple cider at the CAB table. This is a great opportunity
+  to learn more about what UCF has to offer.
 LOCATION:Student Union Patio
 ORGANIZER:CAB (Campus Activities Board)
 END:VEVENT
