@@ -1,0 +1,8 @@
+com.example.hackathon_project.app-pngs-0 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/build/generated/res/pngs/debug
+com.example.hackathon_project.app-updated_navigation_xml-1 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/build/generated/updated_navigation_xml/debug
+com.example.hackathon_project.app-packageDebugResources-2 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.example.hackathon_project.app-packageDebugResources-3 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.example.hackathon_project.app-debug-4 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.example.hackathon_project.app-debug-5 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/debug/res
+com.example.hackathon_project.app-main-6 /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/res
+gradleHome-0 /home/spencerb/.gradle
