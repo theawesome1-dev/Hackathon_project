@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run backend test",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/Backend/test.py",
+      "cwd": "${workspaceFolder}/Backend",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/Backend/.env"
+    },
+    {
+      "name": "Run scraper",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/Backend/scraper.py",
+      "cwd": "${workspaceFolder}/Backend",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "--username",
+        "nasa",
+        "--max-records",
+        "10",
+        "--posts-limit",
+        "1"
+      ],
+      "envFile": "${workspaceFolder}/Backend/.env"
+    }
+  ]
+}
