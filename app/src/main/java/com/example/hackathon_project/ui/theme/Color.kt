@@ -2,10 +2,10 @@ package com.example.hackathon_project.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val moss = Color(0xFF6E6E46)
+val darkBrown = Color(0xFF423626)
+val chocolate = Color(0xFF5D4641)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val lightBrown = Color(0xFF7B614D)
+val beige = Color(0xFFBFB094)
+val brownGreen = Color(0xFF9E9470)

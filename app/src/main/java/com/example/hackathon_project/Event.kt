@@ -1,0 +1,10 @@
+package com.example.hackathon_project
+
+// Data class representing an event (supports mutable properties for database operations)
+data class Event(
+    var id: Long = 0,
+    var name: String = "",
+    var date: String = "",
+    var time: String = "",
+    var location: String = ""
+)

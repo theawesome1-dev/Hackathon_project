@@ -1,6 +1,5 @@
 package com.example.hackathon_project.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,35 +8,41 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.hackathon_project.MyScreenContent
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = moss,
+    secondary = lightBrown,
+    tertiary = chocolate,
+    background = moss,
+    surface = moss,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = beige,
+    onSurface = beige
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = moss,
+    secondary = lightBrown,
+    tertiary = chocolate,
+    background = moss,
+    surface = beige,
     onPrimary = Color.White,
     onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onBackground = darkBrown,
+    onSurface = darkBrown
 )
 
 @Composable
 fun Hackathon_projectTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Set dynamicColor = false by default so your custom color scheme (moss, beige, brown) is used
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -55,4 +60,12 @@ fun Hackathon_projectTheme(
         typography = Typography,
         content = content
     )
+}
+
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)
+@Composable
+fun GreetingPreview() {
+    Hackathon_projectTheme {
+        MyScreenContent()
+    }
 }
