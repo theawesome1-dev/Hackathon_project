@@ -132,7 +132,7 @@ fun EventButton(
 ) {
     Card(
         onClick = {
-            
+
         },
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
