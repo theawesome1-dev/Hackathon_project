@@ -9,3 +9,10 @@ val chocolate = Color(0xFF5D4641)
 val lightBrown = Color(0xFF7B614D)
 val beige = Color(0xFFBFB094)
 val brownGreen = Color(0xFF9E9470)
+
+
+val InstagramBlack = Color(0xFF18181B)
+val InstagramBlue = Color(0xFF3479E9)
+val InstagramWhite = Color(0xFFFFFFFF)
+val InstagramGrey = Color(0xFF52525B)
+val InstagramMagenta = Color(0xFFDD2A7B)
