@@ -155,6 +155,14 @@ def send_to_ai(result: dict[str, Any], prompt: str) -> str:
         raise RuntimeError("AI API response did not contain a chat completion.") from exc
 
 
+def parse_ai_answer(answer: str) -> Any:
+    stripped_answer = answer.strip()
+    try:
+        return json.loads(stripped_answer)
+    except json.JSONDecodeError:
+        return stripped_answer
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Send saved Instagram scraper results to an AI chat-completions API."
@@ -173,19 +181,23 @@ def main() -> None:
         output_path = resolve_path(args.output_file)
         results = load_results(results_path)
         prompt = args.prompt if args.prompt is not None else load_prompt(resolve_path(args.prompt_file))
-        sections = []
+        analysis_records = []
         for index, result in enumerate(results, start=1):
             print(f"Sending result {index}/{len(results)} to AI...")
             answer = send_to_ai(result, prompt)
-            #label = f"Result {index} - {result.get('username', 'unknown')}"
-           # post_url = result.get("post_url")
-            #if post_url:
-             #   label += f" ({post_url})"
-            sections.append(f"{answer}")
-            
+            analysis_records.append(
+                {
+                    "username": result.get("username"),
+                    "post_url": result.get("post_url"),
+                    "analysis": parse_ai_answer(answer),
+                }
+            )
 
-        output_path.write_text("\n\n".join(sections) + "\n", encoding="utf-8")
-        print("\n\n".join(sections))
+        output_path.write_text(
+            json.dumps(analysis_records, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        print(f"Analyzed {len(analysis_records)} result(s).")
         print(f"\nSaved AI response to {output_path}")
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)

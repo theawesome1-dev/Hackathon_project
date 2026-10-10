@@ -45,7 +45,7 @@ object ApiClient {
     }
 
     // 2. Send a List of Account Names to Backend (POST /update)
-    suspend fun sendAccounts(accountNames: List<String>): Boolean {
+    suspend fun sendAccounts(accountName : String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL/update")
@@ -58,8 +58,7 @@ object ApiClient {
                 connection.readTimeout = 5000
 
                 // Build JSON array string from List<String>
-                val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
-                val jsonInputString = "{\"accounts\": $jsonArrayString}"
+                val jsonInputString = "{\"accounts\": $accountName}"
 
                 connection.outputStream.use { os ->
                     val input = jsonInputString.toByteArray(Charsets.UTF_8)
