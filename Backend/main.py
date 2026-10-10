@@ -3,9 +3,10 @@ import subprocess
 import sys
 from contextlib import asynccontextmanager
 
-import uvicorn
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+import uvicorn
 
 
 def run_script(name: str, required: bool = True):
@@ -30,11 +31,25 @@ async def lifespan(app: FastAPI):
     yield
 
 
+# 1. Initialize app FIRST
 app = FastAPI(lifespan=lifespan)
 
 
+# 2. Define routes AFTER app is created
 @app.get("/data")
 def get_data():
+    with open("ai_analysis.json") as f:
+        return JSONResponse(content=json.load(f))
+
+
+@app.get("/refresh")
+def refresh_data():
+    # Re-run your backend collection/AI scripts when requested
+    run_script("test_image_caption_link.py")
+    run_script("send_results_to_ai.py")
+    run_script("toCalendar.py", required=False)
+
+    # Return the newly analyzed data
     with open("ai_analysis.json") as f:
         return JSONResponse(content=json.load(f))
 
