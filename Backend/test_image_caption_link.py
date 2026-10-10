@@ -31,7 +31,7 @@ for index, username in enumerate(usernames, start=1):
                 "post_date": item.get("post_date"),
             }
             all_results.append(record)
-            print(record)
+            print(json.dumps(record, ensure_ascii=True))
     except Exception as exc:
         print(f"Skipping '{username}' due to error: {exc}")
         continue

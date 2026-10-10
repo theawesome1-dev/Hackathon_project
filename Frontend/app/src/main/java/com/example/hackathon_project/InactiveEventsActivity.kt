@@ -33,21 +33,18 @@ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Log
 
-// Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates
-val inactiveEventsList = mutableStateListOf(
-    Event(id = 101, name = "Past Planning Meeting", date = "Feb 10", time = "10:00 AM", location = "Room 202", isActive = false),
-    Event(id = 102, name = "Old Workshop", date = "Feb 15", time = "02:00 PM", location = "Lab 5", isActive = false),
-)
+val inactiveEventsList = mutableStateListOf<Event>()
 
 class InactiveEventsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        fetchEventFromFastApi()
         setContent {
             Hackathon_projectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPanelPadding ->
@@ -62,46 +59,67 @@ class InactiveEventsActivity : ComponentActivity() {
 
     private fun fetchEventFromFastApi() {
         lifecycleScope.launch(Dispatchers.IO) {
+            var connection: HttpURLConnection? = null
             try {
-                // Call FastAPI /refresh endpoint (10.0.2.2 for Android Emulator)
                 val url = URL("http://26.29.51.138:8000/refresh")
-                val connection = url.openConnection() as HttpURLConnection
+                connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 180_000
 
+                val responseCode = connection.responseCode
+                val responseStream = if (responseCode in 200..299) {
+                    connection.inputStream
+                } else {
+                    connection.errorStream
+                }
+                val responseString = responseStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+                Log.d("FastAPI_Response", responseString)
 
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    throw IllegalStateException("Backend returned HTTP $responseCode: $responseString")
+                }
 
-                // Inside fetchEventFromFastApi():
-                val responseString = connection.inputStream.bufferedReader().use { it.readText() }
-                Log.d("FastAPI_Response", responseString) // <-- Prints to Logcat tab in Android Studio
-
-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val responseString = connection.inputStream.bufferedReader().use { it.readText() }
-                    val json = JSONObject(responseString)
-
-                    val title = json.optString("title", "Untitled")
-                    val start = json.optString("start", "")
-                    val location = json.optString("location", "Unknown")
-
-                    val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
-                    val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
-
-                    withContext(Dispatchers.Main) {
-                        receiveEvent(name = title, date = date, time = time, location = location)
+                val eventArray = JSONArray(responseString)
+                val fetchedEvents = buildList {
+                    for (index in 0 until eventArray.length()) {
+                        val eventJson = eventArray.optJSONObject(index) ?: continue
+                        val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
+                        val start = eventJson.optString("start")
+                        add(
+                            Event(
+                                name = title,
+                                date = if (start.length >= 10) start.substring(0, 10) else "TBD",
+                                time = if (start.length >= 16) start.substring(11, 16) else "TBD",
+                                location = eventJson.optString("location", "Unknown"),
+                                isActive = false,
+                            )
+                        )
                     }
                 }
-                connection.disconnect()
+
+                withContext(Dispatchers.Main) {
+                    receiveEvents(fetchedEvents)
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("FastAPI_Error", "Could not load events from backend", e)
+            } finally {
+                connection?.disconnect()
             }
         }
     }
 }
 
-fun receiveEvent(name: String, date: String, time: String, location: String) {
-    val newId = (inactiveEventsList.maxOfOrNull { it.id } ?: 100) + 1
-    inactiveEventsList.add(Event(id = newId, name = name, date = date, time = time, location = location, isActive = false))
+fun receiveEvents(events: List<Event>) {
+    events.forEach { event ->
+        val alreadyPresent = inactiveEventsList.any {
+            it.name == event.name && it.date == event.date
+        }
+        if (!alreadyPresent) {
+            val newId = (inactiveEventsList.maxOfOrNull { it.id } ?: 100) + 1
+            inactiveEventsList.add(event.copy(id = newId))
+        }
+    }
 }
 
 @Composable
@@ -132,32 +150,47 @@ fun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> U
                         onClick = onFetchClicked,
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
-                        Text("Fetch Latest Event from Backend")
+                        Text("Refresh Events from Backend")
                     }
                 }
             }
-            items(inactiveEventsList, key = { it.id }) { eventItem ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = eventItem.name,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            text = "${eventItem.date} at ${eventItem.time}",
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Text(
-                            text = "📍 ${eventItem.location} (Inactive)",
-                            style = MaterialTheme.typography.bodySmall,
-                        )
+
+            if (inactiveEventsList.isEmpty()) {
+                item {
+                    Text(
+                        text = "No inactive events found. Tap refresh to load from backend.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                items(inactiveEventsList, key = { it.id }) { eventItem ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = eventItem.name,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            Text(
+                                text = "${eventItem.date} at ${eventItem.time}",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = "📍 ${eventItem.location} (Inactive)",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                     }
                 }
             }
