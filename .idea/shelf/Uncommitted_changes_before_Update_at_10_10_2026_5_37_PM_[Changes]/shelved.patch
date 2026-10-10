@@ -1,0 +1,285 @@
+Index: Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.tooling.preview.Devices\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.lifecycle.lifecycleScope\r\nimport com.example.hackathon_project.ui.theme.Hackathon_projectTheme\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.launch\r\nimport kotlinx.coroutines.withContext\r\nimport org.json.JSONObject\r\nimport java.net.HttpURLConnection\r\nimport java.net.URL\r\nimport android.util.Log\r\n\r\n// Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates\r\nval inactiveEventsList = mutableStateListOf(\r\n    Event(id = 101, name = \"Past Planning Meeting\", date = \"Feb 10\", time = \"10:00 AM\", location = \"Room 202\", isActive = false),\r\n    Event(id = 102, name = \"Old Workshop\", date = \"Feb 15\", time = \"02:00 PM\", location = \"Lab 5\", isActive = false),\r\n)\r\n\r\nclass InactiveEventsActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        setContent {\r\n            Hackathon_projectTheme {\r\n                Scaffold(modifier = Modifier.fillMaxSize()) { innerPanelPadding ->\r\n                    InactiveEventsContent(\r\n                        modifier = Modifier.padding(innerPanelPadding),\r\n                        onFetchClicked = { fetchEventFromFastApi() }\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun fetchEventFromFastApi() {\r\n        lifecycleScope.launch(Dispatchers.IO) {\r\n            try {\r\n                // Call FastAPI /refresh endpoint (10.0.2.2 for Android Emulator)\r\n                val url = URL(\"http://26.29.51.138:8000/refresh\")\r\n                val connection = url.openConnection() as HttpURLConnection\r\n                connection.requestMethod = \"GET\"\r\n                connection.connectTimeout = 5000\r\n                connection.readTimeout = 5000\r\n\r\n\r\n\r\n                // Inside fetchEventFromFastApi():\r\n                val responseString = connection.inputStream.bufferedReader().use { it.readText() }\r\n                Log.d(\"FastAPI_Response\", responseString) // <-- Prints to Logcat tab in Android Studio\r\n\r\n                if (connection.responseCode == HttpURLConnection.HTTP_OK) {\r\n                    val responseString = connection.inputStream.bufferedReader().use { it.readText() }\r\n                    val json = JSONObject(responseString)\r\n\r\n                    val title = json.optString(\"title\", \"Untitled\")\r\n                    val start = json.optString(\"start\", \"\")\r\n                    val location = json.optString(\"location\", \"Unknown\")\r\n\r\n                    val date = if (start.length >= 10) start.substring(0, 10) else \"TBD\"\r\n                    val time = if (start.length >= 16) start.substring(11, 16) else \"TBD\"\r\n\r\n                    withContext(Dispatchers.Main) {\r\n                        receiveEvent(name = title, date = date, time = time, location = location)\r\n                    }\r\n                }\r\n                connection.disconnect()\r\n            } catch (e: Exception) {\r\n                e.printStackTrace()\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nfun receiveEvent(name: String, date: String, time: String, location: String) {\r\n    val newId = (inactiveEventsList.maxOfOrNull { it.id } ?: 100) + 1\r\n    inactiveEventsList.add(Event(id = newId, name = name, date = date, time = time, location = location, isActive = false))\r\n}\r\n\r\n@Composable\r\nfun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> Unit = {}) {\r\n    Surface(\r\n        modifier = modifier.fillMaxSize(),\r\n        color = MaterialTheme.colorScheme.background,\r\n    ) {\r\n        LazyColumn(\r\n            modifier = Modifier.fillMaxSize(),\r\n            contentPadding = PaddingValues(16.dp),\r\n            verticalArrangement = Arrangement.spacedBy(12.dp),\r\n        ) {\r\n            item {\r\n                Column(\r\n                    modifier = Modifier.fillMaxWidth(),\r\n                    horizontalAlignment = Alignment.CenterHorizontally\r\n                ) {\r\n                    Text(\r\n                        text = \"Inactive Events\",\r\n                        style = MaterialTheme.typography.headlineLarge,\r\n                        fontWeight = FontWeight.Bold,\r\n                        textAlign = TextAlign.Center,\r\n                        color = MaterialTheme.colorScheme.onBackground,\r\n                        modifier = Modifier.padding(bottom = 8.dp),\r\n                    )\r\n                    Button(\r\n                        onClick = onFetchClicked,\r\n                        modifier = Modifier.padding(bottom = 16.dp)\r\n                    ) {\r\n                        Text(\"Fetch Latest Event from Backend\")\r\n                    }\r\n                }\r\n            }\r\n            items(inactiveEventsList, key = { it.id }) { eventItem ->\r\n                Card(\r\n                    modifier = Modifier.fillMaxWidth(),\r\n                    colors = CardDefaults.cardColors(\r\n                        containerColor = MaterialTheme.colorScheme.surfaceVariant,\r\n                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,\r\n                    ),\r\n                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),\r\n                ) {\r\n                    Column(modifier = Modifier.padding(16.dp)) {\r\n                        Text(\r\n                            text = eventItem.name,\r\n                            style = MaterialTheme.typography.titleMedium,\r\n                        )\r\n                        Text(\r\n                            text = \"${eventItem.date} at ${eventItem.time}\",\r\n                            style = MaterialTheme.typography.bodyMedium,\r\n                        )\r\n                        Text(\r\n                            text = \"\uD83D\uDCCD ${eventItem.location} (Inactive)\",\r\n                            style = MaterialTheme.typography.bodySmall,\r\n                        )\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)\r\n@Composable\r\nfun InactiveEventsPreview() {\r\n    Hackathon_projectTheme {\r\n        InactiveEventsContent()\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(revision 68c099cb78d1a141f62d580f9b4c418a8d6343ba)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(date 1791663567718)
+@@ -30,13 +30,7 @@
+ import androidx.compose.ui.unit.dp
+ import androidx.lifecycle.lifecycleScope
+ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+-import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.launch
+-import kotlinx.coroutines.withContext
+-import org.json.JSONObject
+-import java.net.HttpURLConnection
+-import java.net.URL
+-import android.util.Log
+ 
+ // Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates
+ val inactiveEventsList = mutableStateListOf(
+@@ -61,39 +55,16 @@
+     }
+ 
+     private fun fetchEventFromFastApi() {
+-        lifecycleScope.launch(Dispatchers.IO) {
+-            try {
+-                // Call FastAPI /refresh endpoint (10.0.2.2 for Android Emulator)
+-                val url = URL("http://26.29.51.138:8000/refresh")
+-                val connection = url.openConnection() as HttpURLConnection
+-                connection.requestMethod = "GET"
+-                connection.connectTimeout = 5000
+-                connection.readTimeout = 5000
+-
+-
+-
+-                // Inside fetchEventFromFastApi():
+-                val responseString = connection.inputStream.bufferedReader().use { it.readText() }
+-                Log.d("FastAPI_Response", responseString) // <-- Prints to Logcat tab in Android Studio
+-
+-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+-                    val responseString = connection.inputStream.bufferedReader().use { it.readText() }
+-                    val json = JSONObject(responseString)
+-
+-                    val title = json.optString("title", "Untitled")
+-                    val start = json.optString("start", "")
+-                    val location = json.optString("location", "Unknown")
+-
+-                    val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
+-                    val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
+-
+-                    withContext(Dispatchers.Main) {
+-                        receiveEvent(name = title, date = date, time = time, location = location)
+-                    }
+-                }
+-                connection.disconnect()
+-            } catch (e: Exception) {
+-                e.printStackTrace()
++        lifecycleScope.launch {
++            // Uses ApiClient to fetch from backend cleanly
++            val eventData = ApiClient.fetchLatestEvent("/refresh")
++            if (eventData != null) {
++                receiveEvent(
++                    name = eventData.title,
++                    date = eventData.date,
++                    time = eventData.time,
++                    location = eventData.location
++                )
+             }
+         }
+     }
+@@ -171,4 +142,4 @@
+     Hackathon_projectTheme {
+         InactiveEventsContent()
+     }
+-}
+\ No newline at end of file
++}
+Index: Frontend/app/src/main/java/com/example/hackathon_project/AccountsActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.tooling.preview.Devices\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport com.example.hackathon_project.ui.theme.Hackathon_projectTheme\r\n\r\nclass AccountsActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        setContent {\r\n            Hackathon_projectTheme {\r\n                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->\r\n                    AccountsContent(modifier = Modifier.padding(innerPadding))\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun AccountsContent(modifier: Modifier = Modifier) {\r\n    Surface(\r\n        modifier = modifier.fillMaxSize(),\r\n        color = MaterialTheme.colorScheme.background,\r\n    ) {\r\n        Column(\r\n            modifier = Modifier\r\n                .fillMaxSize()\r\n                .padding(24.dp),\r\n            horizontalAlignment = Alignment.CenterHorizontally,\r\n            verticalArrangement = Arrangement.Top\r\n        ) {\r\n            Text(\r\n                text = \"Accounts\",\r\n                style = MaterialTheme.typography.headlineLarge,\r\n                fontWeight = FontWeight.Bold,\r\n                textAlign = TextAlign.Center,\r\n                color = MaterialTheme.colorScheme.onBackground,\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(vertical = 16.dp)\r\n            )\r\n\r\n            Card(\r\n                modifier = Modifier.fillMaxWidth(),\r\n                colors = CardDefaults.cardColors(\r\n                    containerColor = MaterialTheme.colorScheme.surface,\r\n                    contentColor = MaterialTheme.colorScheme.onSurface\r\n                ),\r\n                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)\r\n            ) {\r\n                Column(modifier = Modifier.padding(16.dp)) {\r\n                    Text(\r\n                        text = \"User Profile\",\r\n                        style = MaterialTheme.typography.titleLarge,\r\n                        fontWeight = FontWeight.SemiBold\r\n                    )\r\n                    Spacer(modifier = Modifier.height(8.dp))\r\n                    Text(text = \"Name: John Doe\", style = MaterialTheme.typography.bodyMedium)\r\n                    Text(text = \"Email: john.doe@example.com\", style = MaterialTheme.typography.bodyMedium)\r\n                    Text(text = \"Role: Organizer\", style = MaterialTheme.typography.bodyMedium)\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)\r\n@Composable\r\nfun AccountsPreview() {\r\n    Hackathon_projectTheme {\r\n        AccountsContent()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/AccountsActivity.kt b/Frontend/app/src/main/java/com/example/hackathon_project/AccountsActivity.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/AccountsActivity.kt	(revision 68c099cb78d1a141f62d580f9b4c418a8d6343ba)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/AccountsActivity.kt	(date 1791663769851)
+@@ -1,6 +1,7 @@
+ package com.example.hackathon_project
+ 
+ import android.os.Bundle
++import android.widget.Toast
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+@@ -11,21 +12,28 @@
+ import androidx.compose.foundation.layout.fillMaxWidth
+ import androidx.compose.foundation.layout.height
+ import androidx.compose.foundation.layout.padding
+-import androidx.compose.material3.Card
+-import androidx.compose.material3.CardDefaults
++import androidx.compose.material3.Button
+ import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.OutlinedTextField
+ import androidx.compose.material3.Scaffold
+ import androidx.compose.material3.Surface
+ import androidx.compose.material3.Text
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.text.font.FontWeight
+ import androidx.compose.ui.text.style.TextAlign
+ import androidx.compose.ui.tooling.preview.Devices
+ import androidx.compose.ui.tooling.preview.Preview
+ import androidx.compose.ui.unit.dp
++import androidx.lifecycle.lifecycleScope
+ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
++import kotlinx.coroutines.launch
+ 
+ class AccountsActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+@@ -34,7 +42,19 @@
+         setContent {
+             Hackathon_projectTheme {
+                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+-                    AccountsContent(modifier = Modifier.padding(innerPadding))
++                    AccountsContent(
++                        modifier = Modifier.padding(innerPadding),
++                        onSubmitAccounts = { accountsList ->
++                            lifecycleScope.launch {
++                                val success = ApiClient.sendAccounts(accountsList)
++                                if (success) {
++                                    Toast.makeText(this@AccountsActivity, "Accounts sent successfully!", Toast.LENGTH_SHORT).show()
++                                } else {
++                                    Toast.makeText(this@AccountsActivity, "Failed to send accounts.", Toast.LENGTH_SHORT).show()
++                                }
++                            }
++                        }
++                    )
+                 }
+             }
+         }
+@@ -42,7 +62,12 @@
+ }
+ 
+ @Composable
+-fun AccountsContent(modifier: Modifier = Modifier) {
++fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<String>) -> Unit = {}) {
++    var account1 by remember { mutableStateOf("") }
++    var account2 by remember { mutableStateOf("") }
++    var account3 by remember { mutableStateOf("") }
++    val context = LocalContext.current
++
+     Surface(
+         modifier = modifier.fillMaxSize(),
+         color = MaterialTheme.colorScheme.background,
+@@ -52,38 +77,65 @@
+                 .fillMaxSize()
+                 .padding(24.dp),
+             horizontalAlignment = Alignment.CenterHorizontally,
+-            verticalArrangement = Arrangement.Top
++            verticalArrangement = Arrangement.SpaceBetween
+         ) {
+-            Text(
+-                text = "Accounts",
+-                style = MaterialTheme.typography.headlineLarge,
+-                fontWeight = FontWeight.Bold,
+-                textAlign = TextAlign.Center,
+-                color = MaterialTheme.colorScheme.onBackground,
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .padding(vertical = 16.dp)
+-            )
++            Column(
++                modifier = Modifier.fillMaxWidth(),
++                horizontalAlignment = Alignment.CenterHorizontally
++            ) {
++                Text(
++                    text = "Add Accounts",
++                    style = MaterialTheme.typography.headlineLarge,
++                    fontWeight = FontWeight.Bold,
++                    textAlign = TextAlign.Center,
++                    color = MaterialTheme.colorScheme.onBackground,
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .padding(vertical = 16.dp)
++                )
+ 
+-            Card(
+-                modifier = Modifier.fillMaxWidth(),
+-                colors = CardDefaults.cardColors(
+-                    containerColor = MaterialTheme.colorScheme.surface,
+-                    contentColor = MaterialTheme.colorScheme.onSurface
+-                ),
+-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+-            ) {
+-                Column(modifier = Modifier.padding(16.dp)) {
+-                    Text(
+-                        text = "User Profile",
+-                        style = MaterialTheme.typography.titleLarge,
+-                        fontWeight = FontWeight.SemiBold
+-                    )
+-                    Spacer(modifier = Modifier.height(8.dp))
+-                    Text(text = "Name: John Doe", style = MaterialTheme.typography.bodyMedium)
+-                    Text(text = "Email: john.doe@example.com", style = MaterialTheme.typography.bodyMedium)
+-                    Text(text = "Role: Organizer", style = MaterialTheme.typography.bodyMedium)
+-                }
++                Spacer(modifier = Modifier.height(16.dp))
++
++                OutlinedTextField(
++                    value = account1,
++                    onValueChange = { account1 = it },
++                    label = { Text("Account 1") },
++                    modifier = Modifier.fillMaxWidth()
++                )
++
++                Spacer(modifier = Modifier.height(12.dp))
++
++                OutlinedTextField(
++                    value = account2,
++                    onValueChange = { account2 = it },
++                    label = { Text("Account 2") },
++                    modifier = Modifier.fillMaxWidth()
++                )
++
++                Spacer(modifier = Modifier.height(12.dp))
++
++                OutlinedTextField(
++                    value = account3,
++                    onValueChange = { account3 = it },
++                    label = { Text("Account 3") },
++                    modifier = Modifier.fillMaxWidth()
++                )
++            }
++
++            Button(
++                onClick = {
++                    val list = listOf(account1, account2, account3).filter { it.isNotBlank() }
++                    if (list.isNotEmpty()) {
++                        onSubmitAccounts(list)
++                    } else {
++                        Toast.makeText(context, "Please enter at least one account", Toast.LENGTH_SHORT).show()
++                    }
++                },
++                modifier = Modifier
++                    .fillMaxWidth()
++                    .padding(bottom = 24.dp)
++            ) {
++                Text("Send Accounts to Backend")
+             }
+         }
+     }
+Index: .idea/deviceManager.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deviceManager.xml b/.idea/deviceManager.xml
+new file mode 100644
+--- /dev/null	(date 1791662650968)
++++ b/.idea/deviceManager.xml	(date 1791662650968)
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="DeviceTable">
++    <option name="columnSorters">
++      <list>
++        <ColumnSorterState>
++          <option name="column" value="Name" />
++          <option name="order" value="ASCENDING" />
++        </ColumnSorterState>
++      </list>
++    </option>
++  </component>
++</project>
+\ No newline at end of file

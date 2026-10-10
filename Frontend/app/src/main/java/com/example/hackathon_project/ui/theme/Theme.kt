@@ -38,6 +38,25 @@ private val LightColorScheme = lightColorScheme(
     onSurface = darkBrown
 )
 
+private val Instagram = lightColorScheme(
+    primary = InstagramBlue,
+    secondary = InstagramBlack,
+    tertiary = InstagramBlack,
+    background = InstagramBlack,
+    surface = InstagramGrey,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onBackground = InstagramWhite,
+    onSurface = InstagramWhite
+)
+
+
+
+
+//val InstagramBlack = Color(0xFF18181B)
+//val InstagramBlue = Color(0xFF3479E9)
+//val InstagramWhite = Color(0xFFFFFFFF)
+
 @Composable
 fun Hackathon_projectTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -51,8 +70,8 @@ fun Hackathon_projectTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> Instagram
+        else -> Instagram
     }
 
     MaterialTheme(
