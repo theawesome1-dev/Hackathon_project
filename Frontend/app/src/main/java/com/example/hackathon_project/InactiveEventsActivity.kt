@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,6 +27,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+
+// Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates
+val inactiveEventsList = mutableStateListOf(
+    Event(id = 101, name = "Past Planning Meeting", date = "Feb 10", time = "10:00 AM", location = "Room 202", isActive = false),
+    Event(id = 102, name = "Old Workshop", date = "Feb 15", time = "02:00 PM", location = "Lab 5", isActive = false),
+)
 
 class InactiveEventsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,13 +48,13 @@ class InactiveEventsActivity : ComponentActivity() {
     }
 }
 
+fun receiveEvent(name: String, date: String, time: String, location: String) {
+    val newId = (inactiveEventsList.maxOfOrNull { it.id } ?: 100) + 1
+    inactiveEventsList.add(Event(id = newId, name = name, date = date, time = time, location = location, isActive = false))
+}
+
 @Composable
 fun InactiveEventsContent(modifier: Modifier = Modifier) {
-    val sampleInactiveEvents = listOf(
-        Event(id = 101, name = "Past Planning Meeting", date = "Feb 10", time = "10:00 AM", location = "Room 202", isActive = false),
-        Event(id = 102, name = "Old Workshop", date = "Feb 15", time = "02:00 PM", location = "Lab 5", isActive = false),
-    )
-
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
@@ -69,7 +76,7 @@ fun InactiveEventsContent(modifier: Modifier = Modifier) {
                         .padding(bottom = 16.dp),
                 )
             }
-            items(sampleInactiveEvents, key = { it.id }) { eventItem ->
+            items(inactiveEventsList, key = { it.id }) { eventItem ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
