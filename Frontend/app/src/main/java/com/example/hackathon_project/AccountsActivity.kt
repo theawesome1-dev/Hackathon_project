@@ -1,6 +1,7 @@
 package com.example.hackathon_project
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,21 +12,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+import kotlinx.coroutines.launch
 
 class AccountsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +42,19 @@ class AccountsActivity : ComponentActivity() {
         setContent {
             Hackathon_projectTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AccountsContent(modifier = Modifier.padding(innerPadding))
+                    AccountsContent(
+                        modifier = Modifier.padding(innerPadding),
+                        onSubmitAccounts = { accountsList ->
+                            lifecycleScope.launch {
+                                val success = ApiClient.sendAccounts(accountsList)
+                                if (success) {
+                                    Toast.makeText(this@AccountsActivity, "Accounts sent successfully!", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(this@AccountsActivity, "Failed to send accounts.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -42,7 +62,12 @@ class AccountsActivity : ComponentActivity() {
 }
 
 @Composable
-fun AccountsContent(modifier: Modifier = Modifier) {
+fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<String>) -> Unit = {}) {
+    var account1 by remember { mutableStateOf("") }
+    var account2 by remember { mutableStateOf("") }
+    var account3 by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
@@ -52,38 +77,65 @@ fun AccountsContent(modifier: Modifier = Modifier) {
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = "Accounts",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground,
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Add Accounts",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = account1,
+                    onValueChange = { account1 = it },
+                    label = { Text("Account 1") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = account2,
+                    onValueChange = { account2 = it },
+                    label = { Text("Account 2") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = account3,
+                    onValueChange = { account3 = it },
+                    label = { Text("Account 3") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Button(
+                onClick = {
+                    val list = listOf(account1, account2, account3).filter { it.isNotBlank() }
+                    if (list.isNotEmpty()) {
+                        onSubmitAccounts(list)
+                    } else {
+                        Toast.makeText(context, "Please enter at least one account", Toast.LENGTH_SHORT).show()
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .padding(bottom = 24.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "User Profile",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "Name: John Doe", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Email: john.doe@example.com", style = MaterialTheme.typography.bodyMedium)
-                    Text(text = "Role: Organizer", style = MaterialTheme.typography.bodyMedium)
-                }
+                Text("Send Accounts to Backend")
             }
         }
     }

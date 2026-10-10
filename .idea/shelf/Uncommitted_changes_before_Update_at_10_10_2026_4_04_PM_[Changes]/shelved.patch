@@ -1,0 +1,121 @@
+Index: Frontend/app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\">\r\n\r\n    <application\r\n        android:allowBackup=\"true\"\r\n        android:dataExtractionRules=\"@xml/data_extraction_rules\"\r\n        android:fullBackupContent=\"@xml/backup_rules\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/Theme.Hackathon_project\">\r\n\r\n        <!-- HomeActivity opens first as the default launcher page -->\r\n        <activity\r\n            android:name=\".HomeActivity\"\r\n            android:exported=\"true\"\r\n            android:label=\"@string/app_name\"\r\n            android:theme=\"@style/Theme.Hackathon_project\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n\r\n        <!-- MainActivity (Active Events) -->\r\n        <activity\r\n            android:name=\".MainActivity\"\r\n            android:exported=\"false\"\r\n            android:label=\"@string/app_name\"\r\n            android:theme=\"@style/Theme.Hackathon_project\"\r\n            android:windowSoftInputMode=\"adjustResize\" />\r\n\r\n        <!-- Inactive Events Activity -->\r\n        <activity\r\n            android:name=\".InactiveEventsActivity\"\r\n            android:exported=\"false\"\r\n            android:label=\"Inactive Events\"\r\n            android:theme=\"@style/Theme.Hackathon_project\" />\r\n\r\n        <!-- Accounts Activity -->\r\n        <activity\r\n            android:name=\".AccountsActivity\"\r\n            android:exported=\"false\"\r\n            android:label=\"Accounts\"\r\n            android:theme=\"@style/Theme.Hackathon_project\" />\r\n\r\n    </application>\r\n\r\n</manifest>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/AndroidManifest.xml b/Frontend/app/src/main/AndroidManifest.xml
+--- a/Frontend/app/src/main/AndroidManifest.xml	(revision 4c176cd4617ba5f65b8af86e0b7c65aa6e292266)
++++ b/Frontend/app/src/main/AndroidManifest.xml	(date 1791660780960)
+@@ -2,6 +2,9 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools">
+ 
++    <!-- 1. Internet permission goes here inside <manifest> -->
++    <uses-permission android:name="android.permission.INTERNET" />
++
+     <application
+         android:allowBackup="true"
+         android:dataExtractionRules="@xml/data_extraction_rules"
+@@ -10,42 +13,43 @@
+         android:label="@string/app_name"
+         android:roundIcon="@mipmap/ic_launcher_round"
+         android:supportsRtl="true"
++        android:usesCleartextTraffic="true"
+         android:theme="@style/Theme.Hackathon_project">
+ 
+-        <!-- HomeActivity opens first as the default launcher page -->
+-        <activity
+-            android:name=".HomeActivity"
+-            android:exported="true"
+-            android:label="@string/app_name"
+-            android:theme="@style/Theme.Hackathon_project">
+-            <intent-filter>
+-                <action android:name="android.intent.action.MAIN" />
+-                <category android:name="android.intent.category.LAUNCHER" />
+-            </intent-filter>
+-        </activity>
++    <!-- HomeActivity opens first as the default launcher page -->
++    <activity
++        android:name=".HomeActivity"
++        android:exported="true"
++        android:label="@string/app_name"
++        android:theme="@style/Theme.Hackathon_project">
++        <intent-filter>
++            <action android:name="android.intent.action.MAIN" />
++            <category android:name="android.intent.category.LAUNCHER" />
++        </intent-filter>
++    </activity>
+ 
+-        <!-- MainActivity (Active Events) -->
+-        <activity
+-            android:name=".MainActivity"
+-            android:exported="false"
+-            android:label="@string/app_name"
+-            android:theme="@style/Theme.Hackathon_project"
+-            android:windowSoftInputMode="adjustResize" />
++    <!-- MainActivity (Active Events) -->
++    <activity
++        android:name=".MainActivity"
++        android:exported="false"
++        android:label="@string/app_name"
++        android:theme="@style/Theme.Hackathon_project"
++        android:windowSoftInputMode="adjustResize" />
+ 
+-        <!-- Inactive Events Activity -->
+-        <activity
+-            android:name=".InactiveEventsActivity"
+-            android:exported="false"
+-            android:label="Inactive Events"
+-            android:theme="@style/Theme.Hackathon_project" />
++    <!-- Inactive Events Activity -->
++    <activity
++        android:name=".InactiveEventsActivity"
++        android:exported="false"
++        android:label="Inactive Events"
++        android:theme="@style/Theme.Hackathon_project" />
+ 
+-        <!-- Accounts Activity -->
+-        <activity
+-            android:name=".AccountsActivity"
+-            android:exported="false"
+-            android:label="Accounts"
+-            android:theme="@style/Theme.Hackathon_project" />
++    <!-- Accounts Activity -->
++    <activity
++        android:name=".AccountsActivity"
++        android:exported="false"
++        android:label="Accounts"
++        android:theme="@style/Theme.Hackathon_project" />
+ 
+-    </application>
++</application>
+ 
+-</manifest>
++    </manifest>
+\ No newline at end of file
+Index: .idea/deviceManager.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deviceManager.xml b/.idea/deviceManager.xml
+new file mode 100644
+--- /dev/null	(date 1791661605217)
++++ b/.idea/deviceManager.xml	(date 1791661605217)
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="DeviceTable">
++    <option name="columnSorters">
++      <list>
++        <ColumnSorterState>
++          <option name="column" value="Name" />
++          <option name="order" value="ASCENDING" />
++        </ColumnSorterState>
++      </list>
++    </option>
++  </component>
++</project>
+\ No newline at end of file

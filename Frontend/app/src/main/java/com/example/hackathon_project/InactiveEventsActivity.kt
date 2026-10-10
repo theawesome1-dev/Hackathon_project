@@ -30,13 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
-import android.util.Log
 
 // Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates
 val inactiveEventsList = mutableStateListOf(
@@ -61,39 +55,16 @@ class InactiveEventsActivity : ComponentActivity() {
     }
 
     private fun fetchEventFromFastApi() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                // Call FastAPI /refresh endpoint (10.0.2.2 for Android Emulator)
-                val url = URL("http://26.29.51.138:8000/refresh")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
-
-
-
-                // Inside fetchEventFromFastApi():
-                val responseString = connection.inputStream.bufferedReader().use { it.readText() }
-                Log.d("FastAPI_Response", responseString) // <-- Prints to Logcat tab in Android Studio
-
-                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
-                    val responseString = connection.inputStream.bufferedReader().use { it.readText() }
-                    val json = JSONObject(responseString)
-
-                    val title = json.optString("title", "Untitled")
-                    val start = json.optString("start", "")
-                    val location = json.optString("location", "Unknown")
-
-                    val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
-                    val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
-
-                    withContext(Dispatchers.Main) {
-                        receiveEvent(name = title, date = date, time = time, location = location)
-                    }
-                }
-                connection.disconnect()
-            } catch (e: Exception) {
-                e.printStackTrace()
+        lifecycleScope.launch {
+            // Uses ApiClient to fetch from backend cleanly
+            val eventData = ApiClient.fetchLatestEvent("/refresh")
+            if (eventData != null) {
+                receiveEvent(
+                    name = eventData.title,
+                    date = eventData.date,
+                    time = eventData.time,
+                    location = eventData.location
+                )
             }
         }
     }
