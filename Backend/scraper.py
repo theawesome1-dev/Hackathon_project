@@ -42,13 +42,19 @@ def build_run_input(
 def extract_post_fields(items: list[dict[str, Any]]) -> list[dict[str, str | None]]:
     extracted: list[dict[str, str | None]] = []
     for item in items:
+        post_type = str(item.get("type", "")).lower()
+        product_type = str(item.get("productType", "")).lower()
+        is_video = "video" in post_type or bool(item.get("videoUrl")) or product_type == "clips"
+
         images = item.get("images")
-        image_url = (
-            item.get("displayUrl")
-            or item.get("imageUrl")
-            or item.get("image_url")
-            or (images[0] if isinstance(images, list) and images else None)
-        )
+        image_url = None
+        if not is_video:
+            image_url = (
+                item.get("displayUrl")
+                or item.get("imageUrl")
+                or item.get("image_url")
+                or (images[0] if isinstance(images, list) and images else None)
+            )
         caption = item.get("caption")
         post_url = item.get("url") or item.get("post_url")
 

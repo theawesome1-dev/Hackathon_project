@@ -1,0 +1,15 @@
+Result 1 - ucf_cab (https://www.instagram.com/p/DeAKWzAg49C/)
+{
+  "is_event": true,
+  "name": "Campus Yard Sale",
+  "venue": "Student Union Patio",
+  "address": null,
+  "performers_or_host": ["CAB"],
+  "ticket_price": "Free",
+  "category": "community",
+  "description": "Join us for the annual Campus Yard Sale to learn about student organizations at UCF and grab some free goodies!",
+  "date": "2023-10-13",
+  "start_time": "12:00",
+  "other_details": "Ends at 15:00. Free drinks at the CAB table while supplies last.",
+  "confidence": 0.9
+}
