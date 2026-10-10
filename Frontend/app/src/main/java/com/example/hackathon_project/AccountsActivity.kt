@@ -45,7 +45,7 @@ class AccountsActivity : ComponentActivity() {
 fun AccountsContent(modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier

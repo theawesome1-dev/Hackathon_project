@@ -7,5 +7,6 @@ data class Event(
     var date: String = "",
     var time: String = "",
     var location: String = "",
-    var isActive: Boolean = false
+    var isActive: Boolean = false,
 )
+

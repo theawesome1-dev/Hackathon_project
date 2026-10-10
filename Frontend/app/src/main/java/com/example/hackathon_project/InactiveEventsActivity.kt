@@ -69,7 +69,7 @@ fun InactiveEventsContent(modifier: Modifier = Modifier) {
                         .padding(bottom = 16.dp),
                 )
             }
-            items(sampleInactiveEvents, key = { eventItem -> eventItem.id }) { eventItem ->
+            items(sampleInactiveEvents, key = { it.id }) { eventItem ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
