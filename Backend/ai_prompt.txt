@@ -8,6 +8,7 @@ title, description (2-4 readable sentences), organizer (A host, club, artist, et
 start (ISO 8601 with timezone offset), end (ISO 8601 or the same as the start time), location (or null).
 If the data has no timezone, assume America/New_York.
 If there is no year, assume it is the current year. If that month has already passed in the current year, make it the next year.
+Use the post publication date supplied with the scraped data to resolve relative dates such as "tomorrow" or "this Friday"; do not confuse it with the event date.
 Return only the JSON object. Do not wrap it in Markdown or code fences.
 again, If you do not think that the data is an event, DO NOT procced with the previous steps. instead, return "NOT AN EVENT".
 

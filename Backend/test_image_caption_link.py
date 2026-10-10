@@ -28,6 +28,7 @@ for index, username in enumerate(usernames, start=1):
                 "image_url": item.get("image_url"),
                 "caption": item.get("caption"),
                 "post_url": item.get("post_url"),
+                "post_date": item.get("post_date"),
             }
             all_results.append(record)
             print(record)

@@ -57,6 +57,7 @@ def extract_post_fields(items: list[dict[str, Any]]) -> list[dict[str, str | Non
             )
         caption = item.get("caption")
         post_url = item.get("url") or item.get("post_url")
+        timestamp = item.get("timestamp")
 
         if not image_url and not caption and not post_url:
             continue
@@ -66,6 +67,7 @@ def extract_post_fields(items: list[dict[str, Any]]) -> list[dict[str, str | Non
                 "image_url": image_url,
                 "caption": caption,
                 "post_url": post_url,
+                "post_date": str(timestamp) if timestamp is not None else None,
             }
         )
     return extracted

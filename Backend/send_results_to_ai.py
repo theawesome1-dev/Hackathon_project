@@ -100,12 +100,12 @@ def send_to_ai(result: dict[str, Any], prompt: str) -> str:
 
     api_url = os.getenv("AI_API_URL", DEFAULT_API_URL)
     model = os.getenv("AI_MODEL", DEFAULT_MODEL)
-    today = date.today().isoformat()
+    #today = date.today().isoformat()
     result_text = {key: value for key, value in result.items() if key != "image_url"}
     message_content: list[dict[str, Any]] = [
         {
             "type": "text",
-            "text": f"in case you need it, today's date is {today}. {prompt}\n\nIndividual scraped post result:\n{json.dumps(result_text, ensure_ascii=False, indent=2)}",
+            "text": f"{prompt}\n\nIndividual scraped post result:\n{json.dumps(result_text, ensure_ascii=False, indent=2)}",
         }
     ]
     image_url = result.get("image_url")
