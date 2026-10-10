@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 
 from fastapi import FastAPI
@@ -35,11 +36,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
+
+
 # 2. Define routes AFTER app is created
 @app.get("/data")
 def get_data():
     with open("ai_analysis.json") as f:
         return JSONResponse(content=json.load(f))
+
 
 
 @app.get("/refresh")
@@ -52,6 +56,26 @@ def refresh_data():
     # Return the newly analyzed data
     with open("ai_analysis.json") as f:
         return JSONResponse(content=json.load(f))
+
+
+from typing import List
+from pydantic import BaseModel
+
+class AccountsRequest(BaseModel):
+    accounts: List[str]
+
+@app.post("/update")
+def update_accounts(request: AccountsRequest):
+    accounts_path = Path(__file__).with_name("accounts.txt")
+    accounts_text = "\n".join(account.strip() for account in request.accounts)
+    if request.accounts:
+        accounts_text += "\n"
+    accounts_path.write_text(accounts_text, encoding="utf-8")
+
+    return {
+        "status": "success", 
+        "message": f"Successfully replaced accounts.txt with {len(request.accounts)} accounts"
+    }
 
 
 if __name__ == "__main__":
