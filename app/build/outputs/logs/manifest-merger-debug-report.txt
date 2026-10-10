@@ -1,0 +1,392 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:2:1-28:12
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:2:1-28:12
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0af32a84e519aed562d3741488d9d893/transformed/material3/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.material:material-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/b64e5ccac257d942624d443fc46017e6/transformed/material/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-ripple-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/0d63c7cbd7b9a7719cb7078c8d48f8d9/transformed/material-ripple/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/deaa3d48138795576bf850356063f7f0/transformed/foundation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/e26f7f89fd56ab7f53dd99152423a358/transformed/animation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/ff7bf067b964625c7d9f5885726e8414/transformed/foundation-layout/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-core-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/80d3d88926bae290c43a292d1d113659/transformed/animation-core/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/2a58ec9281875dc461d2526192f41b93/transformed/ui-tooling-data/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/3ca947c5dd6a165434ae2589264ab1f1/transformed/ui-unit/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/320acebf3e60fdad6bafdf14fcc8cda1/transformed/ui-geometry/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-util-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/c79f77614e98a858195cf4d147a96848/transformed/ui-util/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-text-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/bf48589775f4d9bf05ef96fea4e9002f/transformed/ui-text/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/40d5c7b2ac0f8fb42f3e9804c1d53992/transformed/ui-tooling-preview/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:17:1-28:12
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/651fb9f911be56b181451e24aef4cf2c/transformed/ui-graphics/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e557602c052500eb4249f961cac31232/transformed/navigationevent/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigationevent:navigationevent-compose-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e8d5025c79f319a28666372681fa52ce/transformed/navigationevent-compose/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity-ktx:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/235a4459ee25ca55e50e755cd60e512b/transformed/activity-ktx-1.13.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd156d193524c8e4cc8156722dbf4fd4/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.transition:transition:1.6.0] /home/spencerb/.gradle/caches/9.6.0/transforms/919919b97deed5b08d1d03c064f59fec/transformed/transition-1.6.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/bc9bf640f9411a8971ec750ec284b969/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b5531153bbc79de8e547849000c690cc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/32307a11ae21ba3bc77f1a1c697a5e84/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/6c35f81206a35662edc7815926661e64/transformed/lifecycle-livedata-core-ktx-2.11.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/797cde2b987f8c466e2669fb0b96b6f1/transformed/lifecycle-livedata-2.11.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/03918f1c60ee2706d7ee8d6918a18ead/transformed/lifecycle-livedata-core-2.11.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f6d0312d0bdf814117b9d223a06fd55c/transformed/lifecycle-viewmodel-2.11.0/AndroidManifest.xml:2:1-5:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/192364ee5217ddafc5e7ac9f619567ff/transformed/lifecycle-viewmodel/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d0d32274925c5f12b51f96b6baa46553/transformed/runtime-retain/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/858df6127668f32294d1831eae662d80/transformed/runtime-annotation/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/5d28acbc609adcd12d634023181f4ca7/transformed/runtime/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/9236abf7c7f8babe5b8c905d0055763e/transformed/runtime-saveable/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-compose-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1fe4060785ad42fa2b50471cf5710721/transformed/savedstate-compose/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c13d591e90b5022c548bb67d91138cab/transformed/savedstate-ktx-1.4.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ab9cb7c461b297c30b49f6116866405d/transformed/savedstate/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f9c55139dd97ba5d8232b3e589d6f981/transformed/lifecycle-viewmodel-savedstate/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/5f8ec68f57b11744fb04c009338ebef7/transformed/core-ktx-1.19.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.autofill:autofill:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b3e408265e3f954234740982a826c6af/transformed/autofill-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.window:window-core-android:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2013a819ef94d3eb6d86198cb42a472c/transformed/window-core/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/spencerb/.gradle/caches/9.6.0/transforms/b32167c9cb25757c2bc23341aea15f03/transformed/graphics-path-1.0.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/a95339eb07fbf577ad6ed4b96f13fedd/transformed/lifecycle-runtime/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/30c3996812687cf89b919e97e8191a8c/transformed/lifecycle-viewmodel-ktx-2.11.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/66e9f6cc776fd0215d25d08f3425239d/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ff004f78b0346b83ffbfa7db44fdd54e/transformed/lifecycle-runtime-compose/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/405b87392ef66f07ff360d063d923483/transformed/ui/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:17:1-29:12
+MERGED from [androidx.activity:activity:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c73e1993837614fe4138c853a2603e16/transformed/activity-1.13.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity-compose:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/27b02364c40cbccc842c8bee30e27eb2/transformed/activity-compose-1.13.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd054acb7a106691abc3cd3e9c3f0807/transformed/core-viewtree-1.0.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0fe81204549206eedc6e73db965b6290/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/fcb971fcd5dec505c5227b00650655f1/transformed/tracing-1.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/401152ca8016efcd68fe1abc96518cd8/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0482919278486d3ff8cb78c0a22d70f6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/be0dbb943dcdb669808f0b3af9cf8dff/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1d6b90bb3d90b03a760353098fdddf1f/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c3eeeb704ce05795920aa90d75c9244c/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0ea2de5cff2e05cef595d793747ca4ae/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+	package
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:5:5-26:19
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:5:5-26:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:28:5-89
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:22:5-27:19
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:22:5-27:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0482919278486d3ff8cb78c0a22d70f6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0482919278486d3ff8cb78c0a22d70f6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:12:9-35
+	android:label
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:10:9-41
+	android:fullBackupContent
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:8:9-54
+	android:roundIcon
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:11:9-54
+	android:icon
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:9:9-43
+	android:allowBackup
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:13:9-55
+	android:dataExtractionRules
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:7:9-65
+activity#com.example.hackathon_project.MainActivity
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:14:9-25:20
+	android:label
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:17:13-45
+	android:windowSoftInputMode
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:19:13-55
+	android:exported
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:16:13-36
+	android:theme
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:18:13-59
+	android:name
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:15:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:20:13-24:29
+action#android.intent.action.MAIN
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:21:17-69
+	android:name
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:21:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:23:17-77
+	android:name
+		ADDED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml:23:27-74
+uses-sdk
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0af32a84e519aed562d3741488d9d893/transformed/material3/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material3:material3-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0af32a84e519aed562d3741488d9d893/transformed/material3/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material:material-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/b64e5ccac257d942624d443fc46017e6/transformed/material/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/b64e5ccac257d942624d443fc46017e6/transformed/material/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/0d63c7cbd7b9a7719cb7078c8d48f8d9/transformed/material-ripple/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/0d63c7cbd7b9a7719cb7078c8d48f8d9/transformed/material-ripple/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/deaa3d48138795576bf850356063f7f0/transformed/foundation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/deaa3d48138795576bf850356063f7f0/transformed/foundation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/e26f7f89fd56ab7f53dd99152423a358/transformed/animation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/e26f7f89fd56ab7f53dd99152423a358/transformed/animation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/ff7bf067b964625c7d9f5885726e8414/transformed/foundation-layout/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/ff7bf067b964625c7d9f5885726e8414/transformed/foundation-layout/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/80d3d88926bae290c43a292d1d113659/transformed/animation-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/80d3d88926bae290c43a292d1d113659/transformed/animation-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/2a58ec9281875dc461d2526192f41b93/transformed/ui-tooling-data/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/2a58ec9281875dc461d2526192f41b93/transformed/ui-tooling-data/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/3ca947c5dd6a165434ae2589264ab1f1/transformed/ui-unit/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/3ca947c5dd6a165434ae2589264ab1f1/transformed/ui-unit/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/320acebf3e60fdad6bafdf14fcc8cda1/transformed/ui-geometry/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/320acebf3e60fdad6bafdf14fcc8cda1/transformed/ui-geometry/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/c79f77614e98a858195cf4d147a96848/transformed/ui-util/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/c79f77614e98a858195cf4d147a96848/transformed/ui-util/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/bf48589775f4d9bf05ef96fea4e9002f/transformed/ui-text/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/bf48589775f4d9bf05ef96fea4e9002f/transformed/ui-text/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/40d5c7b2ac0f8fb42f3e9804c1d53992/transformed/ui-tooling-preview/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/40d5c7b2ac0f8fb42f3e9804c1d53992/transformed/ui-tooling-preview/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/651fb9f911be56b181451e24aef4cf2c/transformed/ui-graphics/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/651fb9f911be56b181451e24aef4cf2c/transformed/ui-graphics/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e557602c052500eb4249f961cac31232/transformed/navigationevent/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e557602c052500eb4249f961cac31232/transformed/navigationevent/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigationevent:navigationevent-compose-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e8d5025c79f319a28666372681fa52ce/transformed/navigationevent-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigationevent:navigationevent-compose-android:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/e8d5025c79f319a28666372681fa52ce/transformed/navigationevent-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/235a4459ee25ca55e50e755cd60e512b/transformed/activity-ktx-1.13.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/235a4459ee25ca55e50e755cd60e512b/transformed/activity-ktx-1.13.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd156d193524c8e4cc8156722dbf4fd4/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd156d193524c8e4cc8156722dbf4fd4/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.transition:transition:1.6.0] /home/spencerb/.gradle/caches/9.6.0/transforms/919919b97deed5b08d1d03c064f59fec/transformed/transition-1.6.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.transition:transition:1.6.0] /home/spencerb/.gradle/caches/9.6.0/transforms/919919b97deed5b08d1d03c064f59fec/transformed/transition-1.6.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/bc9bf640f9411a8971ec750ec284b969/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/bc9bf640f9411a8971ec750ec284b969/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b5531153bbc79de8e547849000c690cc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b5531153bbc79de8e547849000c690cc/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/32307a11ae21ba3bc77f1a1c697a5e84/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/32307a11ae21ba3bc77f1a1c697a5e84/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/6c35f81206a35662edc7815926661e64/transformed/lifecycle-livedata-core-ktx-2.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/6c35f81206a35662edc7815926661e64/transformed/lifecycle-livedata-core-ktx-2.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/797cde2b987f8c466e2669fb0b96b6f1/transformed/lifecycle-livedata-2.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/797cde2b987f8c466e2669fb0b96b6f1/transformed/lifecycle-livedata-2.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/03918f1c60ee2706d7ee8d6918a18ead/transformed/lifecycle-livedata-core-2.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/03918f1c60ee2706d7ee8d6918a18ead/transformed/lifecycle-livedata-core-2.11.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f6d0312d0bdf814117b9d223a06fd55c/transformed/lifecycle-viewmodel-2.11.0/AndroidManifest.xml:4:5-43
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f6d0312d0bdf814117b9d223a06fd55c/transformed/lifecycle-viewmodel-2.11.0/AndroidManifest.xml:4:5-43
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/192364ee5217ddafc5e7ac9f619567ff/transformed/lifecycle-viewmodel/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/192364ee5217ddafc5e7ac9f619567ff/transformed/lifecycle-viewmodel/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d0d32274925c5f12b51f96b6baa46553/transformed/runtime-retain/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-retain-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d0d32274925c5f12b51f96b6baa46553/transformed/runtime-retain/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/858df6127668f32294d1831eae662d80/transformed/runtime-annotation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/858df6127668f32294d1831eae662d80/transformed/runtime-annotation/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/5d28acbc609adcd12d634023181f4ca7/transformed/runtime/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/5d28acbc609adcd12d634023181f4ca7/transformed/runtime/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/9236abf7c7f8babe5b8c905d0055763e/transformed/runtime-saveable/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/9236abf7c7f8babe5b8c905d0055763e/transformed/runtime-saveable/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-compose-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1fe4060785ad42fa2b50471cf5710721/transformed/savedstate-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-compose-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1fe4060785ad42fa2b50471cf5710721/transformed/savedstate-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c13d591e90b5022c548bb67d91138cab/transformed/savedstate-ktx-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c13d591e90b5022c548bb67d91138cab/transformed/savedstate-ktx-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ab9cb7c461b297c30b49f6116866405d/transformed/savedstate/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-android:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ab9cb7c461b297c30b49f6116866405d/transformed/savedstate/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f9c55139dd97ba5d8232b3e589d6f981/transformed/lifecycle-viewmodel-savedstate/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/f9c55139dd97ba5d8232b3e589d6f981/transformed/lifecycle-viewmodel-savedstate/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/5f8ec68f57b11744fb04c009338ebef7/transformed/core-ktx-1.19.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/5f8ec68f57b11744fb04c009338ebef7/transformed/core-ktx-1.19.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.autofill:autofill:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b3e408265e3f954234740982a826c6af/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/b3e408265e3f954234740982a826c6af/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window-core-android:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2013a819ef94d3eb6d86198cb42a472c/transformed/window-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.window:window-core-android:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2013a819ef94d3eb6d86198cb42a472c/transformed/window-core/AndroidManifest.xml:5:5-44
+MERGED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/spencerb/.gradle/caches/9.6.0/transforms/b32167c9cb25757c2bc23341aea15f03/transformed/graphics-path-1.0.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.graphics:graphics-path:1.0.1] /home/spencerb/.gradle/caches/9.6.0/transforms/b32167c9cb25757c2bc23341aea15f03/transformed/graphics-path-1.0.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/a95339eb07fbf577ad6ed4b96f13fedd/transformed/lifecycle-runtime/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/a95339eb07fbf577ad6ed4b96f13fedd/transformed/lifecycle-runtime/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/30c3996812687cf89b919e97e8191a8c/transformed/lifecycle-viewmodel-ktx-2.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/30c3996812687cf89b919e97e8191a8c/transformed/lifecycle-viewmodel-ktx-2.11.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/66e9f6cc776fd0215d25d08f3425239d/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/66e9f6cc776fd0215d25d08f3425239d/transformed/lifecycle-runtime-ktx/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ff004f78b0346b83ffbfa7db44fdd54e/transformed/lifecycle-runtime-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-compose-android:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/ff004f78b0346b83ffbfa7db44fdd54e/transformed/lifecycle-runtime-compose/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/405b87392ef66f07ff360d063d923483/transformed/ui/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/405b87392ef66f07ff360d063d923483/transformed/ui/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c73e1993837614fe4138c853a2603e16/transformed/activity-1.13.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c73e1993837614fe4138c853a2603e16/transformed/activity-1.13.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity-compose:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/27b02364c40cbccc842c8bee30e27eb2/transformed/activity-compose-1.13.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-compose:1.13.0] /home/spencerb/.gradle/caches/9.6.0/transforms/27b02364c40cbccc842c8bee30e27eb2/transformed/activity-compose-1.13.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd054acb7a106691abc3cd3e9c3f0807/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/cd054acb7a106691abc3cd3e9c3f0807/transformed/core-viewtree-1.0.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0fe81204549206eedc6e73db965b6290/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0fe81204549206eedc6e73db965b6290/transformed/annotation-experimental-1.4.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/fcb971fcd5dec505c5227b00650655f1/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/fcb971fcd5dec505c5227b00650655f1/transformed/tracing-1.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/401152ca8016efcd68fe1abc96518cd8/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/401152ca8016efcd68fe1abc96518cd8/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0482919278486d3ff8cb78c0a22d70f6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/0482919278486d3ff8cb78c0a22d70f6/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/be0dbb943dcdb669808f0b3af9cf8dff/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/spencerb/.gradle/caches/9.6.0/transforms/be0dbb943dcdb669808f0b3af9cf8dff/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1d6b90bb3d90b03a760353098fdddf1f/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/1d6b90bb3d90b03a760353098fdddf1f/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c3eeeb704ce05795920aa90d75c9244c/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/c3eeeb704ce05795920aa90d75c9244c/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0ea2de5cff2e05cef595d793747ca4ae/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/spencerb/.gradle/caches/9.6.0/transforms/0ea2de5cff2e05cef595d793747ca4ae/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+	android:targetSdkVersion
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/spencerb/AndroidStudioProjects/Hackathon_project/app/src/main/AndroidManifest.xml
+activity#androidx.compose.ui.tooling.PreviewActivity
+ADDED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:23:9-25:39
+	android:exported
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/7629ca5cf6992d4d9bd57362deb23084/transformed/ui-tooling/AndroidManifest.xml:24:13-71
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/spencerb/.gradle/caches/9.6.0/transforms/26d209cd83d3d79dc88e7af45e26e59e/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/19e50b0eaa0d75ae4dd1646d10b093a1/transformed/emoji2-1.4.0/AndroidManifest.xml:30:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.11.0] /home/spencerb/.gradle/caches/9.6.0/transforms/d2e508606ffc99da7f0f5af4708b6a35/transformed/lifecycle-process-2.11.0/AndroidManifest.xml:30:17-78
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:23:9-25:40
+	android:required
+		ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:24:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:26:9-28:40
+	android:required
+		ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.window:window:1.5.0] /home/spencerb/.gradle/caches/9.6.0/transforms/2874a5720787e7542c464c6eec18ea97/transformed/window-1.5.0/AndroidManifest.xml:27:13-51
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:23:9-81
+permission#com.example.hackathon_project.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:26:22-94
+uses-permission#com.example.hackathon_project.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.19.1] /home/spencerb/.gradle/caches/9.6.0/transforms/9157efedeaee73dd79970c65ab8a932c/transformed/core-1.19.1/AndroidManifest.xml:26:22-94
+activity#androidx.activity.ComponentActivity
+ADDED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:23:9-26:79
+	android:exported
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:25:13-36
+	android:theme
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:26:13-76
+	android:name
+		ADDED from [androidx.compose.ui:ui-test-manifest:1.10.4] /home/spencerb/.gradle/caches/9.6.0/transforms/6b022e559ac8a79cdd1719be30cc9be3/transformed/ui-test-manifest-1.10.4/AndroidManifest.xml:24:13-63
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] /home/spencerb/.gradle/caches/9.6.0/transforms/47a5f8f593c6544c16b13fb8b120bcc6/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
