@@ -159,7 +159,7 @@ def parse_args() -> argparse.Namespace:
         description="Send saved Instagram scraper results to an AI chat-completions API."
     )
     parser.add_argument("--results-file", default="results.json", help="JSON results file in Backend.")
-    parser.add_argument("--output-file", default="ai_analysis.txt", help="Where to save the AI response.")
+    parser.add_argument("--output-file", default="ai_analysis.json", help="Where to save the AI response.")
     parser.add_argument("--prompt-file", default="ai_prompt.txt", help="Text file containing the AI instructions.")
     parser.add_argument("--prompt", default=None, help="Override the prompt file for this run.")
     return parser.parse_args()
@@ -176,11 +176,12 @@ def main() -> None:
         for index, result in enumerate(results, start=1):
             print(f"Sending result {index}/{len(results)} to AI...")
             answer = send_to_ai(result, prompt)
-            label = f"Result {index} - {result.get('username', 'unknown')}"
-            post_url = result.get("post_url")
-            if post_url:
-                label += f" ({post_url})"
-            sections.append(f"{label}\n{answer}")
+            #label = f"Result {index} - {result.get('username', 'unknown')}"
+           # post_url = result.get("post_url")
+            #if post_url:
+             #   label += f" ({post_url})"
+            sections.append(f"{answer}")
+            
 
         output_path.write_text("\n\n".join(sections) + "\n", encoding="utf-8")
         print("\n\n".join(sections))
