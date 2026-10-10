@@ -12,7 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -20,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +41,8 @@ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import kotlinx.coroutines.launch
 
 class AccountsActivity : ComponentActivity() {
+    var count = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -62,11 +69,10 @@ class AccountsActivity : ComponentActivity() {
 }
 
 @Composable
-fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<String>) -> Unit = {}) {
+fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) -> Unit = {}) {
     var account1 by remember { mutableStateOf("") }
-    var account2 by remember { mutableStateOf("") }
-    var account3 by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val cardList = remember { mutableStateListOf<String>() }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -80,7 +86,9 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<Strin
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -99,36 +107,48 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<Strin
                 OutlinedTextField(
                     value = account1,
                     onValueChange = { account1 = it },
-                    label = { Text("Account 1") },
+                    label = { Text("Account Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = account2,
-                    onValueChange = { account2 = it },
-                    label = { Text("Account 2") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = account3,
-                    onValueChange = { account3 = it },
-                    label = { Text("Account 3") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(cardList) { itemText ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = itemText,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             Button(
                 onClick = {
-                    val list = listOf(account1, account2, account3).filter { it.isNotBlank() }
-                    if (list.isNotEmpty()) {
-                        onSubmitAccounts(list)
+                    if (account1.isNotBlank()) {
+                        onSubmitAccounts(account1)
+                        cardList.add(account1)
+                        account1 = ""
                     } else {
-                        Toast.makeText(context, "Please enter at least one account", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Please enter an account",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 },
                 modifier = Modifier
