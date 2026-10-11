@@ -92,29 +92,10 @@ private fun parseToChronologicalOrder(event: Event): String {
 // List of active events to be displayed
 @Composable
 fun MyScreenContent(modifier: Modifier = Modifier) {
-    val sampleEvents = listOf(
-        Event(id = 5, name = "Tech Workshop", date = "April 01", time = "10:00 AM", location = "Room 102", isActive = true),
-        Event(id = 1, name = "Hackathon Kickoff", date = "March 30", time = "09:00 AM", location = "Main Hall", isActive = true),
-        Event(id = 3, name = "Project Presentations", date = "March 31", time = "04:00 PM", location = "Auditorium", isActive = true),
-        Event(id = 2, name = "Coding Sprint", date = "March 30", time = "01:00 PM", location = "Lab 101", isActive = true),
-        Event(id = 6, name = "Networking Lunch", date = "April 01", time = "12:30 PM", location = "Cafeteria", isActive = true),
-        Event(id = 4, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage", isActive = true),
-        Event(id = 8, name = "Hackathon Judging", date = "April 02", time = "02:00 PM", location = "Lab 101", isActive = true),
-        Event(id = 7, name = "Keynote Speech", date = "April 02", time = "09:30 AM", location = "Main Hall", isActive = true),
-        Event(id = 9, name = "Closing Ceremony", date = "April 02", time = "05:00 PM", location = "Auditorium", isActive = true),
-    )
-
-    // Observable state list sorted chronologically from soonest to latest
-    val events = remember {
-        mutableStateListOf<Event>().apply {
-            addAll(sampleEvents.sortedBy { parseToChronologicalOrder(it) })
-        }
-    }
-
     EventList(
-        events = events,
+        events = EventRepository.activeEvents,
         onDeleteEvent = { eventToDelete ->
-            events.remove(eventToDelete)
+            EventRepository.activeEvents.remove(eventToDelete)
         },
         modifier = modifier
     )
