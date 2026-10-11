@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,6 +36,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,8 +61,11 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
+import android.provider.CalendarContract
 
 class InactiveEventsActivity : ComponentActivity() {
+    private var onNewEventCallback: ((Event) -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -75,7 +80,8 @@ class InactiveEventsActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPanelPadding),
                         onFetchClicked = { fetchEventFromFastApi() },
                         onAddEvent = { event -> EventRepository.promoteToActive(event) },
-                        onDeleteEvent = { event -> EventRepository.removeInactive(event) }
+                        onDeleteEvent = { event -> EventRepository.removeInactive(event) },
+                        registerNewEventCallback = { callback -> onNewEventCallback = callback }
                     )
                 }
             }
@@ -86,14 +92,14 @@ class InactiveEventsActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             try {
-                val url = URL("http://26.29.51.138:8000/refresh")
+                val url = URL("http://10.32.220.33:8000/refresh")
                 connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 600000
-                connection.readTimeout = 600000
+                connection.readTimeout = 300000
 
                 val responseCode = connection.responseCode
-                val responseStream = if (responseCode in 200..299) {
+                val responseStream = if (responseCode in 200..1000) {
                     connection.inputStream
                 } else {
                     connection.errorStream
@@ -101,45 +107,93 @@ class InactiveEventsActivity : ComponentActivity() {
                 val responseString = responseStream?.bufferedReader()?.use { it.readText() }.orEmpty()
                 Log.d("FastAPI_Response", responseString)
 
-                if (responseCode != HttpURLConnection.HTTP_OK) {
+                if (responseCode !in 200..299) {
                     throw IllegalStateException("Backend returned HTTP $responseCode: $responseString")
                 }
 
-                val eventArray = JSONArray(responseString)
-                val fetchedEvents = buildList {
+                val fetchedEvents = mutableListOf<Event>()
+                val trimmed = responseString.trim()
+
+                if (trimmed.startsWith("[")) {
+                    val eventArray = JSONArray(trimmed)
                     for (index in 0 until eventArray.length()) {
                         val eventJson = eventArray.optJSONObject(index) ?: continue
-                        val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
-                        val start = eventJson.optString("start")
-                        val description = eventJson.optString("description", "")
-                        val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
-                        add(
-                            Event(
-                                name = title,
-                                date = if (start.length >= 10) start.substring(0, 10) else "TBD",
-                                time = if (start.length >= 16) start.substring(11, 16) else "TBD",
-                                location = eventJson.optString("location", "Unknown"),
-                                description = description,
-                                postUrl = postUrl,
-                                isActive = false,
-                            )
-                        )
+                        parseEventJson(eventJson)?.let { fetchedEvents.add(it) }
+                    }
+                } else if (trimmed.startsWith("{")) {
+                    val jsonObject = org.json.JSONObject(trimmed)
+                    if (jsonObject.has("events") || jsonObject.has("data")) {
+                        val arrayKey = if (jsonObject.has("events")) "events" else "data"
+                        val eventArray = jsonObject.optJSONArray(arrayKey)
+                        if (eventArray != null) {
+                            for (index in 0 until eventArray.length()) {
+                                val eventJson = eventArray.optJSONObject(index) ?: continue
+                                parseEventJson(eventJson)?.let { fetchedEvents.add(it) }
+                            }
+                        }
+                    } else {
+                        parseEventJson(jsonObject)?.let { fetchedEvents.add(it) }
                     }
                 }
 
                 withContext(Dispatchers.Main) {
-                    receiveEvents(fetchedEvents)
+                    val newlyAdded = receiveEvents(fetchedEvents)
+                    if (newlyAdded.isNotEmpty()) {
+                        val latest = newlyAdded.first()
+                        Toast.makeText(this@InactiveEventsActivity, "New post detected: ${latest.name}", Toast.LENGTH_LONG).show()
+                        onNewEventCallback?.invoke(latest)
+                    } else {
+                        Toast.makeText(this@InactiveEventsActivity, "No new posts detected", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: java.net.SocketTimeoutException) {
+                Log.e("FastAPI_Error", "Connection timed out while loading events from backend", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@InactiveEventsActivity, "Request timed out. Server is taking too long to respond.", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: java.net.SocketException) {
+                Log.e("FastAPI_Error", "Socket closed or network error while loading events from backend", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@InactiveEventsActivity, "Connection closed by server or network interrupted.", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 Log.e("FastAPI_Error", "Could not load events from backend", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@InactiveEventsActivity, "Error connecting to backend: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
             } finally {
                 connection?.disconnect()
             }
         }
     }
+
+    private fun parseEventJson(eventJson: org.json.JSONObject): Event? {
+        val title = eventJson.optString("title", eventJson.optString("name", "")).takeIf { it.isNotBlank() } ?: return null
+        val start = eventJson.optString("start", eventJson.optString("date", ""))
+        val end = eventJson.optString("end", "")
+        val description = eventJson.optString("description", "")
+        val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
+        val location = eventJson.optString("location", "Unknown")
+
+        val date = if (start.length >= 10) start.substring(0, 10) else if (start.isNotBlank()) start else "TBD"
+        val startTime = if (start.length >= 16) start.substring(11, 16) else if (start.isNotBlank()) start else "TBD"
+        val endTime = if (end.length >= 16) end.substring(11, 16) else end
+
+        return Event(
+            name = title,
+            date = date,
+            start = startTime,
+            end = endTime,
+            location = location,
+            description = description,
+            postUrl = postUrl,
+            isActive = false,
+        )
+    }
 }
 
-fun receiveEvents(events: List<Event>) {
+fun receiveEvents(events: List<Event>): List<Event> {
+    val newlyAdded = mutableListOf<Event>()
     events.forEach { event ->
         val key = "${event.name}_${event.date}"
         val alreadyPresent = EventRepository.inactiveEvents.any { "${it.name}_${it.date}" == key }
@@ -148,9 +202,12 @@ fun receiveEvents(events: List<Event>) {
 
         if (!alreadyPresent && !alreadyActive && !alreadyDismissed) {
             val newId = (EventRepository.inactiveEvents.maxOfOrNull { it.id } ?: 100) + 1
-            EventRepository.inactiveEvents.add(event.copy(id = newId))
+            val newEvent = event.copy(id = newId)
+            EventRepository.inactiveEvents.add(newEvent)
+            newlyAdded.add(newEvent)
         }
     }
+    return newlyAdded
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,7 +216,8 @@ fun InactiveEventsContent(
     modifier: Modifier = Modifier,
     onFetchClicked: () -> Unit = {},
     onAddEvent: (Event) -> Unit = {},
-    onDeleteEvent: (Event) -> Unit = {}
+    onDeleteEvent: (Event) -> Unit = {},
+    registerNewEventCallback: ((Event) -> Unit) -> Unit = {}
 ) {
     var isButtonEnabled by remember { mutableStateOf(true) }
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
@@ -167,6 +225,12 @@ fun InactiveEventsContent(
     val context = LocalContext.current
     val activity = context as? Activity
     val textColor = Color.White
+
+    LaunchedEffect(Unit) {
+        registerNewEventCallback { event ->
+            selectedEvent = event
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         Surface(
@@ -273,7 +337,11 @@ fun InactiveEventsContent(
         if (selectedEvent != null) {
             EventDetailDialog(
                 event = selectedEvent!!,
-                onDismiss = { selectedEvent = null }
+                onDismiss = { selectedEvent = null },
+                onDelete = {
+                    EventRepository.removeInactive(selectedEvent!!)
+                    selectedEvent = null
+                }
             )
         }
     }
@@ -287,6 +355,8 @@ fun InactiveEventCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -312,7 +382,7 @@ fun InactiveEventCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${event.date} at ${event.time}",
+                    text = "${event.date} from ${event.start} to ${event.end}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(2.dp))
@@ -322,9 +392,24 @@ fun InactiveEventCard(
                 )
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(onClick = onAdd) {
                     Text("Add")
+                }
+                TextButton(onClick = {
+                    val intent = Intent(Intent.ACTION_INSERT).apply {
+                        data = CalendarContract.Events.CONTENT_URI
+                        putExtra(CalendarContract.Events.TITLE, event.name)
+                        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, parseDateTimeToMillis(event.date, event.start))
+                        if (event.end.isNotBlank()) {
+                            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, parseDateTimeToMillis(event.date, event.end))
+                        }
+                        putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
+                        putExtra(CalendarContract.Events.DESCRIPTION, event.description)
+                    }
+                    context.startActivity(intent)
+                }) {
+                    Text(text = "Calendar")
                 }
                 TextButton(onClick = onDelete) {
                     Text(
@@ -335,6 +420,37 @@ fun InactiveEventCard(
             }
         }
     }
+}
+
+private fun parseDateTimeToMillis(dateStr: String, timeStr: String): Long {
+    try {
+        val formats = listOf(
+            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault()),
+            java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()),
+            java.text.SimpleDateFormat("MMM dd yyyy HH:mm", java.util.Locale.getDefault()),
+            java.text.SimpleDateFormat("MMM dd", java.util.Locale.getDefault())
+        )
+        val combined = "$dateStr $timeStr".trim()
+        for (format in formats) {
+            try {
+                format.isLenient = true
+                val date = format.parse(combined)
+                if (date != null) return date.time
+            } catch (e: Exception) {
+                // try next
+            }
+            try {
+                format.isLenient = true
+                val date = format.parse(dateStr.trim())
+                if (date != null) return date.time
+            } catch (e: Exception) {
+                // try next
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return System.currentTimeMillis()
 }
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)

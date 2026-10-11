@@ -26,6 +26,7 @@ object ApiClient {
 
                     val title = json.optString("title", "Untitled")
                     val start = json.optString("start", "")
+                    var end = json.optString("end", "")
                     val location = json.optString("location", "Unknown")
                     val description = json.optString("description", "")
                     val postUrl = json.optString("image_url", json.optString("post_url", ""))
@@ -38,7 +39,8 @@ object ApiClient {
                         id = System.currentTimeMillis(),
                         name = title,
                         date = date,
-                        time = time,
+                        start = start,
+                        end = end,
                         location = location,
                         description = description,
                         postUrl = postUrl,
@@ -54,7 +56,11 @@ object ApiClient {
     }
 
     // 2. Send Account Names to Backend (POST /update)
-    suspend fun sendAccounts(accountNames: String): Boolean {
+    suspend fun sendAccounts(accountName: String): Boolean {
+        return sendAccounts(listOf(accountName))
+    }
+
+    suspend fun sendAccounts(accountNames: List<String>): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL/update")
@@ -63,19 +69,24 @@ object ApiClient {
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
                 connection.setRequestProperty("Accept", "application/json")
                 connection.doOutput = true
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
 
-                //val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
-                print(accountNames)
-                val jsonInputString = "{\"accounts\": \"$accountNames\"}"
+                val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
+                val jsonInputString = "{\"accounts\": $jsonArrayString}"
 
                 connection.outputStream.use { os ->
                     val input = jsonInputString.toByteArray(Charsets.UTF_8)
                     os.write(input, 0, input.size)
                 }
 
-                val success = connection.responseCode == HttpURLConnection.HTTP_OK
+                val responseCode = connection.responseCode
+                val success = responseCode in 200..299
+                if (!success) {
+                    val errorResponse = connection.errorStream?.bufferedReader()?.readText()
+                    println("sendAccounts HTTP $responseCode Error: $errorResponse")
+                }
+
                 connection.disconnect()
                 return@withContext success
             } catch (e: Exception) {
