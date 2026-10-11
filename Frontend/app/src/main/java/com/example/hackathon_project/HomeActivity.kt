@@ -118,7 +118,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                 // Header Section over gradient (White Text for High Contrast)
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "Event Hub",
+                        text = "Flyr",
                         style = MaterialTheme.typography.displayMedium,
                         fontWeight = FontWeight.Bold,
                         color = InstagramWhite
@@ -215,11 +215,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text(
-                    text = "Version 1.0",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = InstagramWhite.copy(alpha = 0.75f)
-                )
+
             }
         }
     }
