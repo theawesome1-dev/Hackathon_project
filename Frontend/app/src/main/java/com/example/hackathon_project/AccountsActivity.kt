@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,12 +37,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import kotlinx.coroutines.launch
-
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 class AccountsActivity : ComponentActivity() {
-    var count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +75,11 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
     var account1 by remember { mutableStateOf("") }
     val context = LocalContext.current
     val cardList = remember { mutableStateListOf<String>() }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        val names = loadNames(context)
+        cardList.addAll(names)
+    }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -142,6 +149,9 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                     if (account1.isNotBlank()) {
                         onSubmitAccounts(account1)
                         cardList.add(account1)
+                         scope.launch{
+                            saveNames(context, cardList)
+                        }
                         account1 = ""
                     } else {
                         Toast.makeText(
