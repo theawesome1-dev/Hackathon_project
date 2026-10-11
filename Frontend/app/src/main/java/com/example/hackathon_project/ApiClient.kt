@@ -8,7 +8,7 @@ import java.net.URL
 
 object ApiClient {
     // Change this to your computer's IP or cloud server URL
-    private const val BASE_URL = "http://10.32.220.33:8000"
+    private const val BASE_URL = "http://10.10.85.83:8000"
 
     // 1. Fetch Event Data (GET /data or /refresh)
     suspend fun fetchLatestEvent(endpoint: String = "/data"): Event? {
@@ -26,13 +26,12 @@ object ApiClient {
 
                     val title = json.optString("title", "Untitled")
                     val start = json.optString("start", "")
-                    var end = json.optString("end", "")
+                    val end = json.optString("end", "")
                     val location = json.optString("location", "Unknown")
                     val description = json.optString("description", "")
                     val postUrl = json.optString("image_url", json.optString("post_url", ""))
 
                     val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
-                    val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
 
                     connection.disconnect()
                     return@withContext Event(
@@ -55,12 +54,8 @@ object ApiClient {
         }
     }
 
-    // 2. Send Account Names to Backend (POST /update)
-    suspend fun sendAccounts(accountName: String): Boolean {
-        return sendAccounts(listOf(accountName))
-    }
-
-    suspend fun sendAccounts(accountNames: List<String>): Boolean {
+    // 2. Send Account Name to Backend (POST /update)
+    suspend fun sendAccount(accountName: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL/update")
@@ -72,8 +67,9 @@ object ApiClient {
                 connection.connectTimeout = 10000
                 connection.readTimeout = 10000
 
-                val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
-                val jsonInputString = "{\"accounts\": $jsonArrayString}"
+                val jsonInputString = JSONObject()
+                    .put("account", accountName.trim())
+                    .toString()
 
                 connection.outputStream.use { os ->
                     val input = jsonInputString.toByteArray(Charsets.UTF_8)
@@ -84,7 +80,45 @@ object ApiClient {
                 val success = responseCode in 200..299
                 if (!success) {
                     val errorResponse = connection.errorStream?.bufferedReader()?.readText()
-                    println("sendAccounts HTTP $responseCode Error: $errorResponse")
+                    println("sendAccount HTTP $responseCode Error: $errorResponse")
+                }
+
+                connection.disconnect()
+                return@withContext success
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+    }
+
+    // 3. Delete Account Name from Backend (POST /delete)
+    suspend fun deleteAccount(accountName: String): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL("$BASE_URL/delete")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                connection.setRequestProperty("Accept", "application/json")
+                connection.doOutput = true
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+
+                val jsonInputString = JSONObject()
+                    .put("account", accountName.trim())
+                    .toString()
+
+                connection.outputStream.use { os ->
+                    val input = jsonInputString.toByteArray(Charsets.UTF_8)
+                    os.write(input, 0, input.size)
+                }
+
+                val responseCode = connection.responseCode
+                val success = responseCode in 200..299
+                if (!success) {
+                    val errorResponse = connection.errorStream?.bufferedReader()?.readText()
+                    println("deleteAccount HTTP $responseCode Error: $errorResponse")
                 }
 
                 connection.disconnect()

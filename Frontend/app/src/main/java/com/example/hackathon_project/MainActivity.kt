@@ -3,10 +3,12 @@ package com.example.hackathon_project
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.provider.CalendarContract
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,10 +58,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import com.example.hackathon_project.ui.theme.InstagramBlue
+import com.example.hackathon_project.ui.theme.InstagramCardBorder
 import com.example.hackathon_project.ui.theme.InstagramDivider
 import com.example.hackathon_project.ui.theme.InstagramLightBackground
 import com.example.hackathon_project.ui.theme.InstagramRed
 import com.example.hackathon_project.ui.theme.InstagramSurface
+import com.example.hackathon_project.ui.theme.InstagramSurfaceElevated
 import com.example.hackathon_project.ui.theme.InstagramTextMuted
 import com.example.hackathon_project.ui.theme.InstagramTextPrimary
 import com.example.hackathon_project.ui.theme.InstagramTextSecondary
@@ -81,40 +86,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Helper function to convert event date/time to a sortable string (Soonest -> Latest)
-private fun parseToChronologicalOrder(event: Event): String {
-    val monthMap = mapOf(
-        "jan" to "01", "feb" to "02", "mar" to "03", "apr" to "04",
-        "may" to "05", "jun" to "06", "jul" to "07", "aug" to "08",
-        "sep" to "09", "oct" to "10", "nov" to "11", "dec" to "12"
-    )
-    val dateParts = event.date.trim().lowercase().split(" ")
-    val monthStr = dateParts.getOrNull(0)?.take(3) ?: "jan"
-    val monthNum = monthMap[monthStr] ?: "01"
-    val dayNum = dateParts.getOrNull(1)?.padStart(2, '0') ?: "01"
-
-    val timeParts = event.start.trim().uppercase().split(" ")
-    val clock = timeParts.getOrNull(0) ?: "00:00"
-    val ampm = timeParts.getOrNull(1) ?: "AM"
-    val clockParts = clock.split(":")
-    val rawHour = clockParts.getOrNull(0)?.toIntOrNull() ?: 0
-    val min = clockParts.getOrNull(1) ?: "00"
-
-    var hour = rawHour
-    if (ampm == "PM" && hour < 12) hour += 12
-    if (ampm == "AM" && hour == 12) hour = 0
-    val hourStr = hour.toString().padStart(2, '0')
-
-    return "$monthNum-$dayNum $hourStr:$min"
-}
-
 // List of active events to be displayed
 @Composable
 fun MyScreenContent(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        EventRepository.ensureLoaded(context)
+    }
+
     EventList(
         events = EventRepository.activeEvents,
         onDeleteEvent = { eventToDelete ->
-            EventRepository.activeEvents.remove(eventToDelete)
+            EventRepository.removeActive(eventToDelete)
+            EventRepository.saveAsync(context)
         },
         modifier = modifier
     )
@@ -129,6 +114,11 @@ fun EventList(
 ) {
     val context = LocalContext.current
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
+
+    // Active events sorted chronologically by date and start time (Soonest -> Latest)
+    val sortedEvents = events.sortedBy { event ->
+        parseDateTimeToMillis(event.date, event.start)
+    }
 
     Box(
         modifier = modifier
@@ -212,7 +202,7 @@ fun EventList(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(events, key = { it.id }) { event ->
+                    items(sortedEvents, key = { it.id }) { event ->
                         EventItem(
                             event = event,
                             onDelete = { onDeleteEvent(event) },
@@ -228,7 +218,9 @@ fun EventList(
                 event = selectedEvent!!,
                 onDismiss = { selectedEvent = null },
                 onDelete = {
-                    EventRepository.activeEvents.remove(selectedEvent!!)
+                    val eventToRemove = selectedEvent!!
+                    EventRepository.removeActive(eventToRemove)
+                    EventRepository.saveAsync(context)
                     selectedEvent = null
                 }
             )
@@ -243,12 +235,15 @@ fun EventItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Clean single-surface row container (Light Mode surface)
+    val context = LocalContext.current
+
+    // Distinct off-white event box container with subtle border
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(InstagramSurface)
+            .border(1.dp, InstagramCardBorder, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp)
     ) {
@@ -289,7 +284,7 @@ fun EventItem(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "${event.date} from ${event.start} to ${event.end}",
+                text = if (event.end.isNotBlank()) "${event.date} from ${event.start} to ${event.end}" else "${event.date} at ${event.start}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = InstagramTextSecondary
             )
@@ -312,27 +307,100 @@ fun EventItem(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable { onClick() }
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "View Details",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = InstagramBlue
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "View Details",
-                tint = InstagramBlue,
-                modifier = Modifier.size(14.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable { onClick() }
+            ) {
+                Text(
+                    text = "View Details",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = InstagramBlue
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "View Details",
+                    tint = InstagramBlue,
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+
+            Button(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_INSERT).apply {
+                        data = CalendarContract.Events.CONTENT_URI
+                        putExtra(CalendarContract.Events.TITLE, event.name)
+                        putExtra(
+                            CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                            parseDateTimeToMillis(event.date, event.start)
+                        )
+                        if (event.end.isNotBlank()) {
+                            putExtra(
+                                CalendarContract.EXTRA_EVENT_END_TIME,
+                                parseDateTimeToMillis(event.date, event.end)
+                            )
+                        }
+                        putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
+                        putExtra(CalendarContract.Events.DESCRIPTION, event.description)
+                    }
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = InstagramSurfaceElevated),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = "Export to Calendar",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = InstagramTextPrimary
+                )
+            }
         }
     }
+}
+
+private fun parseDateTimeToMillis(dateStr: String, timeStr: String): Long {
+    try {
+        val formats = listOf(
+            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US),
+            java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.US),
+            java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US),
+            java.text.SimpleDateFormat("MM/dd/yyyy HH:mm", java.util.Locale.US),
+            java.text.SimpleDateFormat("MM/dd/yyyy", java.util.Locale.US),
+            java.text.SimpleDateFormat("MMM dd yyyy HH:mm", java.util.Locale.US),
+            java.text.SimpleDateFormat("MMM dd yyyy", java.util.Locale.US),
+            java.text.SimpleDateFormat("MMM dd", java.util.Locale.US)
+        )
+        val combined = "$dateStr $timeStr".trim()
+        for (format in formats) {
+            try {
+                format.isLenient = true
+                val date = format.parse(combined)
+                if (date != null) return date.time
+            } catch (_: Exception) {
+                // try next
+            }
+            try {
+                format.isLenient = true
+                val date = format.parse(dateStr.trim())
+                if (date != null) return date.time
+            } catch (_: Exception) {
+                // try next
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return System.currentTimeMillis()
 }
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)

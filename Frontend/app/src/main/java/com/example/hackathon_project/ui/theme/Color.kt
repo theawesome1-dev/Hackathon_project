@@ -7,9 +7,9 @@ import androidx.compose.ui.graphics.Color
 val InstagramBlack = Color(0xFF000000)
 val InstagramWhite = Color(0xFFFFFFFF)
 val InstagramLightBackground = Color(0xFFFAFAFA)
-val InstagramSurface = Color(0xFFFFFFFF)
-val InstagramSurfaceElevated = Color(0xFFF4F4F5)
-val InstagramCardBorder = Color(0xFFE4E4E7)
+val InstagramSurface = Color(0xFFEFEFF2) // Slightly darker off-white surface so event boxes stand out
+val InstagramSurfaceElevated = Color(0xFFE4E4E8)
+val InstagramCardBorder = Color(0xFFD8D8DE)
 
 val InstagramBlue = Color(0xFF0095F6)
 val InstagramBluePressed = Color(0xFF1877F2)
@@ -17,9 +17,9 @@ val InstagramRed = Color(0xFFED4956)
 val InstagramGreen = Color(0xFF34C759)
 
 val InstagramTextPrimary = Color(0xFF0F0F12)
-val InstagramTextSecondary = Color(0xFF65676B)
-val InstagramTextMuted = Color(0xFF8E8E93)
-val InstagramDivider = Color(0xFFE4E4E7)
+val InstagramTextSecondary = Color(0xFF55575C)
+val InstagramTextMuted = Color(0xFF787880)
+val InstagramDivider = Color(0xFFD8D8DE)
 
 val InstagramPink = Color(0xFFE1306C)
 val InstagramPurple = Color(0xFF833AB4)
@@ -40,6 +40,6 @@ val InstagramPinkGradient = Brush.verticalGradient(
         Color(0xFF833AB4), // Instagram Purple
         Color(0xFFDD2A7B), // Instagram Pink / Magenta
         Color(0xFFF77737), // Instagram Coral / Orange
-        Color(0xFFFCAF45)  // Instagram Warm Gold / Yellow (No Black at bottom!)
+        Color(0xFFFCAF45)  // Instagram Warm Gold / Yellow
     )
 )

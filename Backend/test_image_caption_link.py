@@ -19,7 +19,8 @@ if not usernames:
 all_results = []
 for index, username in enumerate(usernames, start=1):
     try:
-        results = run_scraper(username=username, max_records=10)
+        # Fetch only the 1 latest post per account
+        results = run_scraper(username=username, max_records=1)
         for item in results:
             if not item.get("image_url") and not item.get("caption") and not item.get("post_url"):
                 continue

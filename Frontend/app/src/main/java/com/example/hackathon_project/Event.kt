@@ -1,6 +1,9 @@
 package com.example.hackathon_project
 
-// Data class representing an event (supports mutable properties for database operations)
+import kotlinx.serialization.Serializable
+
+// Data class representing an event (supports mutable properties and persistence)
+@Serializable
 data class Event(
     var id: Long = 0,
     var name: String = "",

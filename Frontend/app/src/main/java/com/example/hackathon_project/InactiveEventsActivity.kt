@@ -1,14 +1,17 @@
 package com.example.hackathon_project
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,7 +51,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,22 +63,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import com.example.hackathon_project.ui.theme.InstagramBlue
+import com.example.hackathon_project.ui.theme.InstagramCardBorder
 import com.example.hackathon_project.ui.theme.InstagramDivider
 import com.example.hackathon_project.ui.theme.InstagramLightBackground
 import com.example.hackathon_project.ui.theme.InstagramRed
 import com.example.hackathon_project.ui.theme.InstagramSurface
+import com.example.hackathon_project.ui.theme.InstagramSurfaceElevated
 import com.example.hackathon_project.ui.theme.InstagramTextMuted
 import com.example.hackathon_project.ui.theme.InstagramTextPrimary
 import com.example.hackathon_project.ui.theme.InstagramTextSecondary
 import com.example.hackathon_project.ui.theme.InstagramWhite
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
-import android.provider.CalendarContract
 
 class InactiveEventsActivity : ComponentActivity() {
     private var onNewEventCallback: ((Event) -> Unit)? = null
@@ -84,7 +86,13 @@ class InactiveEventsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        fetchEventFromFastApi()
+
+        val isFetchingState = mutableStateOf(false)
+        fetchEventFromFastApi(
+            onStart = { isFetchingState.value = true },
+            onComplete = { isFetchingState.value = false }
+        )
+
         setContent {
             Hackathon_projectTheme {
                 Scaffold(
@@ -93,9 +101,23 @@ class InactiveEventsActivity : ComponentActivity() {
                 ) { innerPanelPadding ->
                     InactiveEventsContent(
                         modifier = Modifier.padding(innerPanelPadding),
-                        onFetchClicked = { fetchEventFromFastApi() },
-                        onAddEvent = { event -> EventRepository.promoteToActive(event) },
-                        onDeleteEvent = { event -> EventRepository.removeInactive(event) },
+                        isFetching = isFetchingState.value,
+                        onFetchClicked = {
+                            if (!isFetchingState.value) {
+                                fetchEventFromFastApi(
+                                    onStart = { isFetchingState.value = true },
+                                    onComplete = { isFetchingState.value = false }
+                                )
+                            }
+                        },
+                        onAddEvent = { event ->
+                            EventRepository.promoteToActive(event)
+                            EventRepository.saveAsync(this@InactiveEventsActivity)
+                        },
+                        onDeleteEvent = { event ->
+                            EventRepository.removeInactive(event)
+                            EventRepository.saveAsync(this@InactiveEventsActivity)
+                        },
                         registerNewEventCallback = { callback -> onNewEventCallback = callback }
                     )
                 }
@@ -103,7 +125,14 @@ class InactiveEventsActivity : ComponentActivity() {
         }
     }
 
-    private fun fetchEventFromFastApi() {
+    private fun fetchEventFromFastApi(
+        onStart: (() -> Unit)? = null,
+        onComplete: (() -> Unit)? = null
+    ) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            onStart?.invoke()
+        }
+
         lifecycleScope.launch(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             try {
@@ -114,7 +143,7 @@ class InactiveEventsActivity : ComponentActivity() {
                 connection.readTimeout = 300000
 
                 val responseCode = connection.responseCode
-                val responseStream = if (responseCode in 200..1000) {
+                val responseStream = if (responseCode in 200..299) {
                     connection.inputStream
                 } else {
                     connection.errorStream
@@ -152,7 +181,7 @@ class InactiveEventsActivity : ComponentActivity() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    val newlyAdded = receiveEvents(fetchedEvents)
+                    val newlyAdded = receiveEvents(this@InactiveEventsActivity, fetchedEvents)
                     if (newlyAdded.isNotEmpty()) {
                         val latest = newlyAdded.first()
                         Toast.makeText(this@InactiveEventsActivity, "New post detected: ${latest.name}", Toast.LENGTH_LONG).show()
@@ -178,17 +207,26 @@ class InactiveEventsActivity : ComponentActivity() {
                 }
             } finally {
                 connection?.disconnect()
+                withContext(Dispatchers.Main) {
+                    onComplete?.invoke()
+                }
             }
         }
     }
 
     private fun parseEventJson(eventJson: org.json.JSONObject): Event? {
-        val title = eventJson.optString("title", eventJson.optString("name", "")).takeIf { it.isNotBlank() } ?: return null
-        val start = eventJson.optString("start", eventJson.optString("date", ""))
-        val end = eventJson.optString("end", "")
-        val description = eventJson.optString("description", "")
-        val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
-        val location = eventJson.optString("location", "Unknown")
+        val jsonToUse = if (eventJson.has("analysis") && eventJson.optJSONObject("analysis") != null) {
+            eventJson.optJSONObject("analysis")!!
+        } else {
+            eventJson
+        }
+
+        val title = jsonToUse.optString("title", jsonToUse.optString("name", "")).takeIf { it.isNotBlank() } ?: return null
+        val start = jsonToUse.optString("start", jsonToUse.optString("date", ""))
+        val end = jsonToUse.optString("end", "")
+        val description = jsonToUse.optString("description", "")
+        val postUrl = jsonToUse.optString("image_url", jsonToUse.optString("post_url", eventJson.optString("post_url", "")))
+        val location = jsonToUse.optString("location", "Unknown")
 
         val date = if (start.length >= 10) start.substring(0, 10) else if (start.isNotBlank()) start else "TBD"
         val startTime = if (start.length >= 16) start.substring(11, 16) else if (start.isNotBlank()) start else "TBD"
@@ -207,13 +245,19 @@ class InactiveEventsActivity : ComponentActivity() {
     }
 }
 
-fun receiveEvents(events: List<Event>): List<Event> {
+fun receiveEvents(context: Context, events: List<Event>): List<Event> {
     val newlyAdded = mutableListOf<Event>()
     events.forEach { event ->
-        val key = "${event.name}_${event.date}"
-        val alreadyPresent = EventRepository.inactiveEvents.any { "${it.name}_${it.date}" == key }
-        val alreadyActive = EventRepository.activeEvents.any { "${it.name}_${it.date}" == key }
-        val alreadyDismissed = EventRepository.dismissedEvents.contains(key)
+        val key = "${event.name.trim().lowercase()}_${event.date.trim()}"
+        val urlKey = event.postUrl.trim()
+
+        val alreadyPresent = EventRepository.inactiveEvents.any {
+            "${it.name.trim().lowercase()}_${it.date.trim()}" == key || (urlKey.isNotBlank() && it.postUrl.trim() == urlKey)
+        }
+        val alreadyActive = EventRepository.activeEvents.any {
+            "${it.name.trim().lowercase()}_${it.date.trim()}" == key || (urlKey.isNotBlank() && it.postUrl.trim() == urlKey)
+        }
+        val alreadyDismissed = EventRepository.dismissedEvents.contains(key) || (urlKey.isNotBlank() && EventRepository.dismissedEvents.contains(urlKey))
 
         if (!alreadyPresent && !alreadyActive && !alreadyDismissed) {
             val newId = (EventRepository.inactiveEvents.maxOfOrNull { it.id } ?: 100) + 1
@@ -222,6 +266,9 @@ fun receiveEvents(events: List<Event>): List<Event> {
             newlyAdded.add(newEvent)
         }
     }
+    if (newlyAdded.isNotEmpty()) {
+        EventRepository.saveAsync(context)
+    }
     return newlyAdded
 }
 
@@ -229,18 +276,18 @@ fun receiveEvents(events: List<Event>): List<Event> {
 @Composable
 fun InactiveEventsContent(
     modifier: Modifier = Modifier,
+    isFetching: Boolean = false,
     onFetchClicked: () -> Unit = {},
     onAddEvent: (Event) -> Unit = {},
     onDeleteEvent: (Event) -> Unit = {},
     registerNewEventCallback: ((Event) -> Unit) -> Unit = {}
 ) {
-    var isButtonEnabled by remember { mutableStateOf(true) }
     var selectedEvent by remember { mutableStateOf<Event?>(null) }
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = context as? Activity
 
     LaunchedEffect(Unit) {
+        EventRepository.ensureLoaded(context)
         registerNewEventCallback { event ->
             selectedEvent = event
         }
@@ -277,21 +324,16 @@ fun InactiveEventsContent(
                 actions = {
                     IconButton(
                         onClick = {
-                            if (isButtonEnabled) {
-                                isButtonEnabled = false
+                            if (!isFetching) {
                                 onFetchClicked()
-                                coroutineScope.launch {
-                                    delay(10000L) // 10 second cooldown
-                                    isButtonEnabled = true
-                                }
                             }
                         },
-                        enabled = isButtonEnabled
+                        enabled = !isFetching
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Fetch New Posts",
-                            tint = if (isButtonEnabled) InstagramBlue else InstagramTextMuted
+                            tint = if (!isFetching) InstagramBlue else InstagramTextMuted
                         )
                     }
                 },
@@ -321,7 +363,7 @@ fun InactiveEventsContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Tap the refresh icon in the top bar to fetch new posts from your connected Instagram accounts.",
+                        text = "Tap the refresh icon in the top bar or the button below to fetch new posts from your connected Instagram accounts.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = InstagramTextSecondary
                     )
@@ -330,22 +372,20 @@ fun InactiveEventsContent(
 
                     Button(
                         onClick = {
-                            if (isButtonEnabled) {
-                                isButtonEnabled = false
+                            if (!isFetching) {
                                 onFetchClicked()
-                                coroutineScope.launch {
-                                    delay(10000L)
-                                    isButtonEnabled = true
-                                }
                             }
                         },
-                        enabled = isButtonEnabled,
-                        colors = ButtonDefaults.buttonColors(containerColor = InstagramBlue),
+                        enabled = !isFetching,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = InstagramBlue,
+                            disabledContainerColor = InstagramSurfaceElevated
+                        ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = if (isButtonEnabled) "Fetch New Posts" else "Please wait...",
-                            color = InstagramWhite
+                            text = if (isFetching) "Fetching Posts..." else "Fetch New Posts",
+                            color = if (isFetching) InstagramTextMuted else InstagramWhite
                         )
                     }
                 }
@@ -372,7 +412,9 @@ fun InactiveEventsContent(
                 event = selectedEvent!!,
                 onDismiss = { selectedEvent = null },
                 onDelete = {
-                    EventRepository.removeInactive(selectedEvent!!)
+                    val eventToRemove = selectedEvent!!
+                    EventRepository.removeInactive(eventToRemove)
+                    EventRepository.saveAsync(context)
                     selectedEvent = null
                 }
             )
@@ -383,20 +425,19 @@ fun InactiveEventsContent(
 @Composable
 fun InactiveEventItem(
     event: Event,
-    onAdd: () -> Unit,
     onDelete: () -> Unit,
+    onAdd: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
-    Card(
-    // Clean single-surface row container (Light mode surface)
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(InstagramSurface)
+            .border(1.dp, InstagramCardBorder, RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(16.dp)
     ) {
@@ -437,7 +478,7 @@ fun InactiveEventItem(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "${event.date} from ${event.start} to ${event.end}",
+                text = if (event.end.isNotBlank()) "${event.date} from ${event.start} to ${event.end}" else "${event.date} at ${event.start}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = InstagramTextSecondary
             )
@@ -460,52 +501,65 @@ fun InactiveEventItem(
             )
         }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Button(onClick = onAdd) {
-                    Text("Add")
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = onAdd,
+                colors = ButtonDefaults.buttonColors(containerColor = InstagramBlue),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add",
+                        tint = InstagramWhite,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Add to Active",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = InstagramWhite
+                    )
                 }
-                TextButton(onClick = {
+            }
+
+            Button(
+                onClick = {
                     val intent = Intent(Intent.ACTION_INSERT).apply {
                         data = CalendarContract.Events.CONTENT_URI
                         putExtra(CalendarContract.Events.TITLE, event.name)
-                        putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, parseDateTimeToMillis(event.date, event.start))
+                        putExtra(
+                            CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                            parseDateTimeToMillis(event.date, event.start)
+                        )
                         if (event.end.isNotBlank()) {
-                            putExtra(CalendarContract.EXTRA_EVENT_END_TIME, parseDateTimeToMillis(event.date, event.end))
+                            putExtra(
+                                CalendarContract.EXTRA_EVENT_END_TIME,
+                                parseDateTimeToMillis(event.date, event.end)
+                            )
                         }
                         putExtra(CalendarContract.Events.EVENT_LOCATION, event.location)
                         putExtra(CalendarContract.Events.DESCRIPTION, event.description)
                     }
                     context.startActivity(intent)
-                }) {
-                    Text(text = "Calendar")
-                }
-                TextButton(onClick = onDelete) {
-                    Text(
-                        text = "Delete",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-        Spacer(modifier = Modifier.height(14.dp))
-
-        Button(
-            onClick = onAdd,
-            colors = ButtonDefaults.buttonColors(containerColor = InstagramBlue),
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = InstagramWhite,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = InstagramSurfaceElevated),
+                shape = RoundedCornerShape(8.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+            ) {
                 Text(
-                    text = "Add to Active",
+                    text = "Export to Calendar",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.SemiBold,
-                    color = InstagramWhite
+                    color = InstagramTextPrimary
                 )
             }
         }

@@ -89,9 +89,9 @@ class AccountsActivity : ComponentActivity() {
                 ) { innerPadding ->
                     AccountsContent(
                         modifier = Modifier.padding(innerPadding),
-                        onSubmitAccounts = { accountsList ->
+                        onSubmitAccounts = { accountName ->
                             lifecycleScope.launch {
-                                val success = ApiClient.sendAccounts(accountsList)
+                                val success = ApiClient.sendAccount(accountName)
                                 if (success) {
                                     Toast.makeText(this@AccountsActivity, "Accounts sent successfully!", Toast.LENGTH_SHORT).show()
                                 } else {
@@ -305,9 +305,14 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
 
                                     IconButton(
                                         onClick = {
+                                            val accountToDelete = itemText
                                             cardList.remove(itemText)
                                             scope.launch {
                                                 saveNames(context, cardList)
+                                                val success = ApiClient.deleteAccount(accountToDelete)
+                                                if (success) {
+                                                    Toast.makeText(context, "Removed @$accountToDelete from accounts.txt", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
                                         },
                                         modifier = Modifier.size(28.dp)
