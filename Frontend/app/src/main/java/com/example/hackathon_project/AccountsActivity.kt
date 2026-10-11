@@ -198,7 +198,7 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "Enter handles to scrape event posts from",
+                        text = "Enter handles to discover event posts from",
                         style = MaterialTheme.typography.bodySmall,
                         color = InstagramTextSecondary
                     )
@@ -311,7 +311,7 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                                                 saveNames(context, cardList)
                                                 val success = ApiClient.deleteAccount(accountToDelete)
                                                 if (success) {
-                                                    Toast.makeText(context, "Removed @$accountToDelete from accounts.txt", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, "Removed @$accountToDelete", Toast.LENGTH_SHORT).show()
                                                 }
                                             }
                                         },
@@ -355,7 +355,7 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Sync Accounts to Backend",
+                            text = "Sync Accounts",
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                             color = InstagramWhite

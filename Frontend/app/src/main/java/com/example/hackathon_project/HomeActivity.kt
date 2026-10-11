@@ -42,9 +42,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import com.example.hackathon_project.ui.theme.InstagramDivider
 import com.example.hackathon_project.ui.theme.InstagramPinkGradient
@@ -115,18 +117,24 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Header Section over gradient (White Text for High Contrast)
-                Column(modifier = Modifier.fillMaxWidth()) {
+                // Header Section over gradient (Bigger & Centered Title)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = "Flyr",
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.displayLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 44.sp,
+                        textAlign = TextAlign.Center,
                         color = InstagramWhite
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Instagram Post Scraper & Event Manager",
+                        text = "Instagram Post & Event Manager",
                         style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
                         color = InstagramWhite.copy(alpha = 0.9f)
                     )
                 }
@@ -187,7 +195,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                     NavigationRow(
                         icon = Icons.Default.Info,
                         title = "Inactive Events",
-                        subtitle = "Review and approve scraped posts",
+                        subtitle = "Review and approve discovered posts",
                         onClick = {
                             runShellScript(context, "echo 'Opening Inactive Events'")
                             val intent = Intent(context, InactiveEventsActivity::class.java)
@@ -204,7 +212,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                     NavigationRow(
                         icon = Icons.Default.AccountCircle,
                         title = "Connected Accounts",
-                        subtitle = "Configure Instagram handles for scraping",
+                        subtitle = "Configure Instagram handles for event discovery",
                         onClick = {
                             runShellScript(context, "echo 'Opening Accounts'")
                             val intent = Intent(context, AccountsActivity::class.java)
@@ -214,8 +222,6 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                 }
 
                 Spacer(modifier = Modifier.height(40.dp))
-
-
             }
         }
     }
