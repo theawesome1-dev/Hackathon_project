@@ -41,8 +41,6 @@ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import kotlinx.coroutines.launch
 
 class AccountsActivity : ComponentActivity() {
-    var count = 0
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -69,8 +67,8 @@ class AccountsActivity : ComponentActivity() {
 }
 
 @Composable
-fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) -> Unit = {}) {
-    var account1 by remember { mutableStateOf("") }
+fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (List<String>) -> Unit = {}) {
+    var accountInput by remember { mutableStateOf("") }
     val context = LocalContext.current
     val cardList = remember { mutableStateListOf<String>() }
 
@@ -105,11 +103,27 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = account1,
-                    onValueChange = { account1 = it },
+                    value = accountInput,
+                    onValueChange = { accountInput = it },
                     label = { Text("Account Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = {
+                        if (accountInput.isNotBlank()) {
+                            cardList.add(accountInput.trim())
+                            accountInput = ""
+                        } else {
+                            Toast.makeText(context, "Please enter an account name", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Add to List")
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -139,16 +153,10 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
 
             Button(
                 onClick = {
-                    if (account1.isNotBlank()) {
-                        onSubmitAccounts(account1)
-                        cardList.add(account1)
-                        account1 = ""
+                    if (cardList.isNotEmpty()) {
+                        onSubmitAccounts(cardList)
                     } else {
-                        Toast.makeText(
-                            context,
-                            "Please enter an account",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, "No accounts added to send", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier
