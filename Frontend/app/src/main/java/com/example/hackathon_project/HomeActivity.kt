@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+import com.example.hackathon_project.ui.theme.InstagramAppGradient
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -39,7 +42,10 @@ class HomeActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Hackathon_projectTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = Color.Transparent
+                ) { innerPadding ->
                     HomeScreenContent(modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -64,10 +70,13 @@ fun runShellScript(context: Context, scriptCommand: String) {
 @Composable
 fun HomeScreenContent(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val textColor = Color.White
 
     Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        modifier = modifier
+            .fillMaxSize()
+            .background(InstagramAppGradient),
+        color = Color.Transparent,
     ) {
         Column(
             modifier = Modifier
@@ -81,7 +90,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = textColor,
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -90,7 +99,7 @@ fun HomeScreenContent(modifier: Modifier = Modifier) {
                 text = "Your central hub for all hackathon events.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                color = textColor.copy(alpha = 0.85f),
             )
 
             Spacer(modifier = Modifier.height(32.dp))
