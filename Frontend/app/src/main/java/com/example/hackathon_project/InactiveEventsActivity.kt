@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+import com.example.hackathon_project.ui.theme.InstagramAppGradient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -62,7 +65,10 @@ class InactiveEventsActivity : ComponentActivity() {
         fetchEventFromFastApi()
         setContent {
             Hackathon_projectTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPanelPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = Color.Transparent
+                ) { innerPanelPadding ->
                     InactiveEventsContent(
                         modifier = Modifier.padding(innerPanelPadding),
                         onFetchClicked = { fetchEventFromFastApi() },
@@ -153,12 +159,17 @@ fun InactiveEventsContent(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = context as? Activity
+    val textColor = Color.White
 
     Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
+        modifier = modifier
+            .fillMaxSize()
+            .background(InstagramAppGradient),
+        color = Color.Transparent,
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(12.dp))
+
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -166,7 +177,8 @@ fun InactiveEventsContent(
                         Text(
                             text = "Inactive Events (${EventRepository.inactiveEvents.size})",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = textColor
                         )
                     }
                 },
@@ -180,11 +192,12 @@ fun InactiveEventsContent(
                         },
                         modifier = Modifier.padding(start = 8.dp)
                     ) {
-                        Text("Back to Home")
+                        Text("Back to Home", color = textColor)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = Color.Transparent,
+                    titleContentColor = textColor
                 )
             )
 
@@ -217,13 +230,13 @@ fun InactiveEventsContent(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(32.dp),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color.Transparent
                 ) {
                     Text(
                         text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = Color.White.copy(alpha = 0.9f),
                     )
                 }
             } else {
@@ -260,10 +273,10 @@ fun InactiveEventCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
             modifier = Modifier
