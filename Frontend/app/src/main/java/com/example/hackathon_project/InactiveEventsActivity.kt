@@ -86,7 +86,7 @@ class InactiveEventsActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             try {
-                val url = URL("http://26.29.51.138:8000/refresh")
+                val url = URL("http://10.32.220.33:8000/refresh")
                 connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 600000
@@ -111,13 +111,15 @@ class InactiveEventsActivity : ComponentActivity() {
                         val eventJson = eventArray.optJSONObject(index) ?: continue
                         val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
                         val start = eventJson.optString("start")
+                        val end = eventJson.optString("end")
                         val description = eventJson.optString("description", "")
                         val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
                         add(
                             Event(
                                 name = title,
-                                date = if (start.length >= 10) start.substring(0, 10) else "TBD",
-                                time = if (start.length >= 16) start.substring(11, 16) else "TBD",
+                                date = parseAmericanDate(start),
+                                startTime = parseAmericanTime(start),
+                                endTime = parseAmericanTime(end),
                                 location = eventJson.optString("location", "Unknown"),
                                 description = description,
                                 postUrl = postUrl,
