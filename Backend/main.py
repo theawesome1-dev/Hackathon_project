@@ -84,23 +84,70 @@ def refresh_data():
     return JSONResponse(content=get_event_response())
 
 
-from typing import List
 from pydantic import BaseModel
 
-class AccountsRequest(BaseModel):
-    accounts: List[str]
+class AccountRequest(BaseModel):
+    account: str
+
+
+def normalize_account(value: str) -> str:
+    account = value.strip()
+    if not account:
+        raise HTTPException(status_code=422, detail="Account cannot be empty.")
+    if "\n" in account or "\r" in account:
+        raise HTTPException(status_code=422, detail="Account must be a single line.")
+    return account
+
+
+def append_account(account: str, accounts_path: Path) -> None:
+    existing_text = accounts_path.read_text(encoding="utf-8-sig") if accounts_path.exists() else ""
+    with accounts_path.open("a", encoding="utf-8", newline="") as accounts_file:
+        if existing_text and not existing_text.endswith(("\n", "\r")):
+            accounts_file.write("\n")
+        accounts_file.write(account + "\n")
+
+
+def remove_account(account: str, accounts_path: Path) -> int:
+    if not accounts_path.exists():
+        return 0
+
+    existing_accounts = accounts_path.read_text(encoding="utf-8-sig").splitlines()
+    remaining_accounts = [
+        line for line in existing_accounts
+        if line.strip() and line.strip().casefold() != account.casefold()
+    ]
+    removed_count = len(existing_accounts) - len(remaining_accounts)
+    accounts_path.write_text(
+        "\n".join(remaining_accounts) + ("\n" if remaining_accounts else ""),
+        encoding="utf-8",
+    )
+    return removed_count
 
 @app.post("/update")
-def update_accounts(request: AccountsRequest):
+def update_accounts(request: AccountRequest):
+    account = normalize_account(request.account)
     accounts_path = Path(__file__).with_name("accounts.txt")
-    accounts_text = "\n".join(account.strip() for account in request.accounts)
-    if request.accounts:
-        accounts_text += "\n"
-    accounts_path.write_text(accounts_text, encoding="utf-8")
+    append_account(account, accounts_path)
 
     return {
-        "status": "success", 
-        "message": f"Successfully replaced accounts.txt with {len(request.accounts)} accounts"
+        "status": "success",
+        "message": f"Added {account} to accounts.txt",
+        "account": account,
+    }
+
+
+@app.post("/delete")
+def delete_account(request: AccountRequest):
+    account = normalize_account(request.account)
+    accounts_path = Path(__file__).with_name("accounts.txt")
+    removed_count = remove_account(account, accounts_path)
+    if not removed_count:
+        raise HTTPException(status_code=404, detail=f"Account {account} was not found.")
+
+    return {
+        "status": "success",
+        "message": f"Removed {account} from accounts.txt",
+        "removed": removed_count,
     }
 
 
