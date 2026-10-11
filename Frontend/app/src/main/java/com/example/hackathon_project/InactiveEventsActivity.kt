@@ -8,7 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -109,12 +111,16 @@ class InactiveEventsActivity : ComponentActivity() {
                         val eventJson = eventArray.optJSONObject(index) ?: continue
                         val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
                         val start = eventJson.optString("start")
+                        val description = eventJson.optString("description", "")
+                        val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
                         add(
                             Event(
                                 name = title,
                                 date = if (start.length >= 10) start.substring(0, 10) else "TBD",
                                 time = if (start.length >= 16) start.substring(11, 16) else "TBD",
                                 location = eventJson.optString("location", "Unknown"),
+                                description = description,
+                                postUrl = postUrl,
                                 isActive = false,
                             )
                         )
@@ -156,109 +162,119 @@ fun InactiveEventsContent(
     onDeleteEvent: (Event) -> Unit = {}
 ) {
     var isButtonEnabled by remember { mutableStateOf(true) }
+    var selectedEvent by remember { mutableStateOf<Event?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = context as? Activity
     val textColor = Color.White
 
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .background(InstagramAppGradient),
-        color = Color.Transparent,
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(
-                            text = "Inactive Events (${EventRepository.inactiveEvents.size})",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = textColor
-                        )
-                    }
-                },
-                navigationIcon = {
-                    OutlinedButton(
-                        onClick = {
-                            val intent = Intent(context, HomeActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            context.startActivity(intent)
-                            activity?.finish()
-                        },
-                        modifier = Modifier.padding(start = 8.dp)
-                    ) {
-                        Text("Back to Home", color = textColor)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = textColor
-                )
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    onClick = {
-                        if (isButtonEnabled) {
-                            isButtonEnabled = false
-                            onFetchClicked()
-                            coroutineScope.launch {
-                                delay(10000L) // 10 second cooldown
-                                isButtonEnabled = true
-                            }
+    Box(modifier = modifier.fillMaxSize()) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(InstagramAppGradient),
+            color = Color.Transparent,
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                TopAppBar(
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = "Inactive Events (${EventRepository.inactiveEvents.size})",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = textColor
+                            )
                         }
                     },
-                    enabled = isButtonEnabled,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    Text(if (isButtonEnabled) "Fetch New Posts" else "Please wait...")
-                }
-            }
-
-            if (EventRepository.inactiveEvents.isEmpty()) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    color = Color.Transparent
-                ) {
-                    Text(
-                        text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = Color.White.copy(alpha = 0.9f),
+                    navigationIcon = {
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(context, HomeActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                context.startActivity(intent)
+                                activity?.finish()
+                            },
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text("Back to Home", color = textColor)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = textColor
                     )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        top = 8.dp,
-                        bottom = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->
-                        InactiveEventCard(
-                            event = eventItem,
-                            onAdd = { onAddEvent(eventItem) },
-                            onDelete = { onDeleteEvent(eventItem) }
+                    Button(
+                        onClick = {
+                            if (isButtonEnabled) {
+                                isButtonEnabled = false
+                                onFetchClicked()
+                                coroutineScope.launch {
+                                    delay(10000L) // 10 second cooldown
+                                    isButtonEnabled = true
+                                }
+                            }
+                        },
+                        enabled = isButtonEnabled,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        Text(if (isButtonEnabled) "Fetch New Posts" else "Please wait...")
+                    }
+                }
+
+                if (EventRepository.inactiveEvents.isEmpty()) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        color = Color.Transparent
+                    ) {
+                        Text(
+                            text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = Color.White.copy(alpha = 0.9f),
                         )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = 8.dp,
+                            bottom = 16.dp,
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->
+                            InactiveEventCard(
+                                event = eventItem,
+                                onAdd = { onAddEvent(eventItem) },
+                                onDelete = { onDeleteEvent(eventItem) },
+                                onClick = { selectedEvent = eventItem }
+                            )
+                        }
                     }
                 }
             }
+        }
+
+        if (selectedEvent != null) {
+            EventDetailDialog(
+                event = selectedEvent!!,
+                onDismiss = { selectedEvent = null }
+            )
         }
     }
 }
@@ -268,10 +284,13 @@ fun InactiveEventCard(
     event: Event,
     onAdd: () -> Unit,
     onDelete: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
             contentColor = MaterialTheme.colorScheme.onSurface,

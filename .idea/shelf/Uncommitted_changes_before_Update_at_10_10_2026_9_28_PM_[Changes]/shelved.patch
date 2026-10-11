@@ -1,0 +1,486 @@
+Index: Frontend/app/src/main/java/com/example/hackathon_project/ApiClient.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.withContext\r\nimport org.json.JSONObject\r\nimport java.net.HttpURLConnection\r\nimport java.net.URL\r\n\r\nobject ApiClient {\r\n    // Change this to your computer's IP or cloud server URL\r\n    private const val BASE_URL = \"http://10.32.220.33:8000\"\r\n    //10.32.220.33\r\n    //26.29.51.138\r\n\r\n    // 1. Fetch Event Data (GET /data or /refresh)\r\n    suspend fun fetchLatestEvent(endpoint: String = \"/data\"): EventData? {\r\n        return withContext(Dispatchers.IO) {\r\n            try {\r\n                val url = URL(\"$BASE_URL$endpoint\")\r\n                val connection = url.openConnection() as HttpURLConnection\r\n                connection.requestMethod = \"GET\"\r\n                connection.connectTimeout = 10000\r\n                connection.readTimeout = 30000\r\n\r\n                if (connection.responseCode == HttpURLConnection.HTTP_OK) {\r\n                    val responseString = connection.inputStream.bufferedReader().use { it.readText() }\r\n                    val json = JSONObject(responseString)\r\n\r\n                    val title = json.optString(\"title\", \"Untitled\")\r\n                    val start = json.optString(\"start\", \"\")\r\n                    val location = json.optString(\"location\", \"Unknown\")\r\n\r\n                    val date = if (start.length >= 10) start.substring(0, 10) else \"TBD\"\r\n                    val time = if (start.length >= 16) start.substring(11, 16) else \"TBD\"\r\n\r\n                    connection.disconnect()\r\n                    return@withContext EventData(title, date, time, location)\r\n                }\r\n                connection.disconnect()\r\n            } catch (e: Exception) {\r\n                e.printStackTrace()\r\n            }\r\n            null\r\n        }\r\n    }\r\n\r\n    // 2. Send a List of Account Names to Backend (POST /update)\r\n    suspend fun sendAccounts(accountName : String): Boolean {\r\n        return withContext(Dispatchers.IO) {\r\n            try {\r\n                val url = URL(\"$BASE_URL/update\")\r\n                val connection = url.openConnection() as HttpURLConnection\r\n                connection.requestMethod = \"POST\"\r\n                connection.setRequestProperty(\"Content-Type\", \"application/json; charset=utf-8\")\r\n                connection.setRequestProperty(\"Accept\", \"application/json\")\r\n                connection.doOutput = true\r\n                connection.connectTimeout = 5000\r\n                connection.readTimeout = 5000\r\n\r\n                // Build JSON array string from List<String>\r\n                val jsonInputString = \"{\\\"accounts\\\": $accountName}\"\r\n\r\n                connection.outputStream.use { os ->\r\n                    val input = jsonInputString.toByteArray(Charsets.UTF_8)\r\n                    os.write(input, 0, input.size)\r\n                }\r\n\r\n                val success = connection.responseCode == HttpURLConnection.HTTP_OK\r\n                connection.disconnect()\r\n                return@withContext success\r\n            } catch (e: Exception) {\r\n                e.printStackTrace()\r\n                false\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n// Simple data holder for network results\r\ndata class EventData(\r\n    val title: String,\r\n    val date: String,\r\n    val time: String,\r\n    val location: String\r\n)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/ApiClient.kt b/Frontend/app/src/main/java/com/example/hackathon_project/ApiClient.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/ApiClient.kt	(revision 763aa70e96c31c02060852972c05fb616f211a71)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/ApiClient.kt	(date 1791681338153)
+@@ -9,11 +9,9 @@
+ object ApiClient {
+     // Change this to your computer's IP or cloud server URL
+     private const val BASE_URL = "http://10.32.220.33:8000"
+-    //10.32.220.33
+-    //26.29.51.138
+ 
+     // 1. Fetch Event Data (GET /data or /refresh)
+-    suspend fun fetchLatestEvent(endpoint: String = "/data"): EventData? {
++    suspend fun fetchLatestEvent(endpoint: String = "/data"): Event? {
+         return withContext(Dispatchers.IO) {
+             try {
+                 val url = URL("$BASE_URL$endpoint")
+@@ -29,12 +27,23 @@
+                     val title = json.optString("title", "Untitled")
+                     val start = json.optString("start", "")
+                     val location = json.optString("location", "Unknown")
++                    val description = json.optString("description", "")
++                    val postUrl = json.optString("image_url", json.optString("post_url", ""))
+ 
+                     val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
+                     val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
+ 
+                     connection.disconnect()
+-                    return@withContext EventData(title, date, time, location)
++                    return@withContext Event(
++                        id = System.currentTimeMillis(),
++                        name = title,
++                        date = date,
++                        time = time,
++                        location = location,
++                        description = description,
++                        postUrl = postUrl,
++                        isActive = false
++                    )
+                 }
+                 connection.disconnect()
+             } catch (e: Exception) {
+@@ -44,8 +53,8 @@
+         }
+     }
+ 
+-    // 2. Send a List of Account Names to Backend (POST /update)
+-    suspend fun sendAccounts(accountName : String): Boolean {
++    // 2. Send Account Names to Backend (POST /update)
++    suspend fun sendAccounts(accountNames: List<String>): Boolean {
+         return withContext(Dispatchers.IO) {
+             try {
+                 val url = URL("$BASE_URL/update")
+@@ -57,8 +66,8 @@
+                 connection.connectTimeout = 5000
+                 connection.readTimeout = 5000
+ 
+-                // Build JSON array string from List<String>
+-                val jsonInputString = "{\"accounts\": $accountName}"
++                val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
++                val jsonInputString = "{\"accounts\": $jsonArrayString}"
+ 
+                 connection.outputStream.use { os ->
+                     val input = jsonInputString.toByteArray(Charsets.UTF_8)
+@@ -75,11 +84,3 @@
+         }
+     }
+ }
+-
+-// Simple data holder for network results
+-data class EventData(
+-    val title: String,
+-    val date: String,
+-    val time: String,
+-    val location: String
+-)
+Index: Frontend/app/src/main/java/com/example/hackathon_project/MainActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport android.app.Activity\r\nimport android.content.Intent\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Box\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.width\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.ExperimentalMaterial3Api\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.OutlinedButton\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TextButton\r\nimport androidx.compose.material3.TopAppBar\r\nimport androidx.compose.material3.TopAppBarDefaults\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.tooling.preview.Devices\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport com.example.hackathon_project.ui.theme.Hackathon_projectTheme\r\nimport com.example.hackathon_project.ui.theme.InstagramAppGradient\r\n\r\nclass MainActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        setContent {\r\n            Hackathon_projectTheme {\r\n                Scaffold(\r\n                    modifier = Modifier.fillMaxSize(),\r\n                    containerColor = Color.Transparent\r\n                ) { innerPadding ->\r\n                    MyScreenContent(modifier = Modifier.padding(innerPadding))\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n// Helper function to convert event date/time to a sortable string (Soonest -> Latest)\r\nprivate fun parseToChronologicalOrder(event: Event): String {\r\n    val monthMap = mapOf(\r\n        \"jan\" to \"01\", \"feb\" to \"02\", \"mar\" to \"03\", \"apr\" to \"04\",\r\n        \"may\" to \"05\", \"jun\" to \"06\", \"jul\" to \"07\", \"aug\" to \"08\",\r\n        \"sep\" to \"09\", \"oct\" to \"10\", \"nov\" to \"11\", \"dec\" to \"12\"\r\n    )\r\n    val dateParts = event.date.trim().lowercase().split(\" \")\r\n    val monthStr = dateParts.getOrNull(0)?.take(3) ?: \"jan\"\r\n    val monthNum = monthMap[monthStr] ?: \"01\"\r\n    val dayNum = dateParts.getOrNull(1)?.padStart(2, '0') ?: \"01\"\r\n\r\n    val timeParts = event.time.trim().uppercase().split(\" \")\r\n    val clock = timeParts.getOrNull(0) ?: \"00:00\"\r\n    val ampm = timeParts.getOrNull(1) ?: \"AM\"\r\n    val clockParts = clock.split(\":\")\r\n    val rawHour = clockParts.getOrNull(0)?.toIntOrNull() ?: 0\r\n    val min = clockParts.getOrNull(1) ?: \"00\"\r\n\r\n    var hour = rawHour\r\n    if (ampm == \"PM\" && hour < 12) hour += 12\r\n    if (ampm == \"AM\" && hour == 12) hour = 0\r\n    val hourStr = hour.toString().padStart(2, '0')\r\n\r\n    return \"$monthNum-$dayNum $hourStr:$min\"\r\n}\r\n\r\n// List of active events to be displayed\r\n@Composable\r\nfun MyScreenContent(modifier: Modifier = Modifier) {\r\n    EventList(\r\n        events = EventRepository.activeEvents,\r\n        onDeleteEvent = { eventToDelete ->\r\n            EventRepository.activeEvents.remove(eventToDelete)\r\n        },\r\n        modifier = modifier\r\n    )\r\n}\r\n\r\n// Formats the column of events with looping background video\r\n@OptIn(ExperimentalMaterial3Api::class)\r\n@Composable\r\nfun EventList(\r\n    events: List<Event>,\r\n    onDeleteEvent: (Event) -> Unit,\r\n    modifier: Modifier = Modifier\r\n) {\r\n    val context = LocalContext.current\r\n    val activity = context as? Activity\r\n\r\n    Box(\r\n        modifier = modifier\r\n            .fillMaxSize()\r\n            .background(InstagramAppGradient)\r\n    ) {\r\n        // Continuous looping animated video background (prioritized over background colors)\r\n        VideoBackground()\r\n\r\n        Surface(\r\n            modifier = Modifier.fillMaxSize(),\r\n            color = Color.Transparent\r\n        ) {\r\n            Column(modifier = Modifier.fillMaxSize()) {\r\n                TopAppBar(\r\n                    title = {\r\n                        Row(verticalAlignment = Alignment.CenterVertically) {\r\n                            Spacer(modifier = Modifier.width(16.dp))\r\n                            Text(\r\n                                text = \"Active Events (${events.size})\",\r\n                                style = MaterialTheme.typography.titleLarge,\r\n                                fontWeight = FontWeight.Bold,\r\n                                color = Color.White\r\n                            )\r\n                        }\r\n                    },\r\n                    navigationIcon = {\r\n                        OutlinedButton(\r\n                            onClick = {\r\n                                val intent = Intent(context, HomeActivity::class.java)\r\n                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP\r\n                                context.startActivity(intent)\r\n                                activity?.finish()\r\n                            },\r\n                            modifier = Modifier.padding(start = 8.dp)\r\n                        ) {\r\n                            Text(\"Back to Home\", color = Color.White)\r\n                        }\r\n                    },\r\n                    colors = TopAppBarDefaults.topAppBarColors(\r\n                        containerColor = Color.Transparent,\r\n                        titleContentColor = Color.White\r\n                    )\r\n                )\r\n\r\n                if (events.isEmpty()) {\r\n                    Surface(\r\n                        modifier = Modifier\r\n                            .fillMaxSize()\r\n                            .padding(32.dp),\r\n                        color = Color.Transparent\r\n                    ) {\r\n                        Text(\r\n                            text = \"No active events remaining.\",\r\n                            style = MaterialTheme.typography.bodyLarge,\r\n                            color = Color.White\r\n                        )\r\n                    }\r\n                } else {\r\n                    LazyColumn(\r\n                        modifier = Modifier.fillMaxSize(),\r\n                        contentPadding = PaddingValues(\r\n                            top = 8.dp,\r\n                            bottom = 16.dp,\r\n                            start = 16.dp,\r\n                            end = 16.dp\r\n                        ),\r\n                        verticalArrangement = Arrangement.spacedBy(12.dp)\r\n                    ) {\r\n                        items(events, key = { it.id }) { event ->\r\n                            EventCard(\r\n                                event = event,\r\n                                onDelete = { onDeleteEvent(event) }\r\n                            )\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun EventCard(\r\n    event: Event,\r\n    onDelete: () -> Unit,\r\n    modifier: Modifier = Modifier,\r\n) {\r\n    Card(\r\n        modifier = modifier.fillMaxWidth(),\r\n        colors = CardDefaults.cardColors(\r\n            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),\r\n            contentColor = MaterialTheme.colorScheme.onSurface\r\n        ),\r\n        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)\r\n    ) {\r\n        Row(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .padding(16.dp),\r\n            horizontalArrangement = Arrangement.SpaceBetween,\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            Column(modifier = Modifier.weight(1f)) {\r\n                Text(\r\n                    text = event.name,\r\n                    style = MaterialTheme.typography.titleMedium,\r\n                    fontWeight = FontWeight.Bold\r\n                )\r\n                Spacer(modifier = Modifier.height(4.dp))\r\n                Text(\r\n                    text = \"${event.date} at ${event.time}\",\r\n                    style = MaterialTheme.typography.bodyMedium\r\n                )\r\n                Spacer(modifier = Modifier.height(2.dp))\r\n                Text(\r\n                    text = \"\uD83D\uDCCD ${event.location}\",\r\n                    style = MaterialTheme.typography.bodySmall\r\n                )\r\n            }\r\n\r\n            TextButton(\r\n                onClick = onDelete,\r\n                modifier = Modifier.padding(start = 8.dp)\r\n            ) {\r\n                Text(\r\n                    text = \"Delete\",\r\n                    color = MaterialTheme.colorScheme.primary\r\n                )\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)\r\n@Composable\r\nfun GreetingPreview() {\r\n    Hackathon_projectTheme {\r\n        MyScreenContent()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/MainActivity.kt b/Frontend/app/src/main/java/com/example/hackathon_project/MainActivity.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/MainActivity.kt	(revision 763aa70e96c31c02060852972c05fb616f211a71)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/MainActivity.kt	(date 1791681566679)
+@@ -7,6 +7,7 @@
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+ import androidx.compose.foundation.background
++import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.Arrangement
+ import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.Column
+@@ -32,8 +33,10 @@
+ import androidx.compose.material3.TopAppBar
+ import androidx.compose.material3.TopAppBarDefaults
+ import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.mutableStateListOf
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.runtime.remember
++import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+@@ -110,14 +113,13 @@
+     modifier: Modifier = Modifier
+ ) {
+     val context = LocalContext.current
+-    val activity = context as? Activity
++    var selectedEvent by remember { mutableStateOf<Event?>(null) }
+ 
+     Box(
+         modifier = modifier
+             .fillMaxSize()
+             .background(InstagramAppGradient)
+     ) {
+-        // Continuous looping animated video background (prioritized over background colors)
+         VideoBackground()
+ 
+         Surface(
+@@ -143,7 +145,7 @@
+                                 val intent = Intent(context, HomeActivity::class.java)
+                                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                 context.startActivity(intent)
+-                                activity?.finish()
++                                (context as? Activity)?.finish()
+                             },
+                             modifier = Modifier.padding(start = 8.dp)
+                         ) {
+@@ -183,13 +185,21 @@
+                         items(events, key = { it.id }) { event ->
+                             EventCard(
+                                 event = event,
+-                                onDelete = { onDeleteEvent(event) }
++                                onDelete = { onDeleteEvent(event) },
++                                onClick = { selectedEvent = event }
+                             )
+                         }
+                     }
+                 }
+             }
+         }
++
++        if (selectedEvent != null) {
++            EventDetailDialog(
++                event = selectedEvent!!,
++                onDismiss = { selectedEvent = null }
++            )
++        }
+     }
+ }
+ 
+@@ -197,10 +207,13 @@
+ fun EventCard(
+     event: Event,
+     onDelete: () -> Unit,
++    onClick: () -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Card(
+-        modifier = modifier.fillMaxWidth(),
++        modifier = modifier
++            .fillMaxWidth()
++            .clickable { onClick() },
+         colors = CardDefaults.cardColors(
+             containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+             contentColor = MaterialTheme.colorScheme.onSurface
+@@ -238,7 +251,7 @@
+             ) {
+                 Text(
+                     text = "Delete",
+-                    color = MaterialTheme.colorScheme.primary
++                    color = MaterialTheme.colorScheme.error
+                 )
+             }
+         }
+Index: Frontend/app/src/main/java/com/example/hackathon_project/EventRepository.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport androidx.compose.runtime.mutableStateListOf\r\n\r\nobject EventRepository {\r\n    // Shared active events list\r\n    val activeEvents = mutableStateListOf(\r\n        Event(id = 5, name = \"Tech Workshop\", date = \"April 01\", time = \"10:00 AM\", location = \"Room 102\", isActive = true),\r\n        Event(id = 1, name = \"Hackathon Kickoff\", date = \"March 30\", time = \"09:00 AM\", location = \"Main Hall\", isActive = true),\r\n        Event(id = 3, name = \"Project Presentations\", date = \"March 31\", time = \"04:00 PM\", location = \"Auditorium\", isActive = true),\r\n        Event(id = 2, name = \"Coding Sprint\", date = \"March 30\", time = \"01:00 PM\", location = \"Lab 101\", isActive = true),\r\n        Event(id = 6, name = \"Networking Lunch\", date = \"April 01\", time = \"12:30 PM\", location = \"Cafeteria\", isActive = true),\r\n        Event(id = 4, name = \"Awards Ceremony\", date = \"March 31\", time = \"06:00 PM\", location = \"Main Stage\", isActive = true),\r\n        Event(id = 8, name = \"Hackathon Judging\", date = \"April 02\", time = \"02:00 PM\", location = \"Lab 101\", isActive = true),\r\n        Event(id = 7, name = \"Keynote Speech\", date = \"April 02\", time = \"09:30 AM\", location = \"Main Hall\", isActive = true),\r\n        Event(id = 9, name = \"Closing Ceremony\", date = \"April 02\", time = \"05:00 PM\", location = \"Auditorium\", isActive = true),\r\n    )\r\n\r\n    // Shared inactive events list (fetched from backend or added dynamically)\r\n    val inactiveEvents = mutableStateListOf<Event>()\r\n\r\n    // Set of dismissed/deleted event unique keys (Name_Date) so they won't be re-fetched\r\n    val dismissedEvents = mutableSetOf<String>()\r\n\r\n    // Move an event from inactive to active\r\n    fun promoteToActive(event: Event) {\r\n        inactiveEvents.remove(event)\r\n        val promotedEvent = event.copy(isActive = true)\r\n        val key = \"${event.name}_${event.date}\"\r\n        dismissedEvents.add(key)\r\n        if (!activeEvents.any { \"${it.name}_${it.date}\" == key }) {\r\n            activeEvents.add(promotedEvent)\r\n        }\r\n    }\r\n\r\n    // Delete an event from inactive and remember it so it won't be re-added\r\n    fun removeInactive(event: Event) {\r\n        inactiveEvents.remove(event)\r\n        dismissedEvents.add(\"${event.name}_${event.date}\")\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/EventRepository.kt b/Frontend/app/src/main/java/com/example/hackathon_project/EventRepository.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/EventRepository.kt	(revision 763aa70e96c31c02060852972c05fb616f211a71)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/EventRepository.kt	(date 1791681095825)
+@@ -4,17 +4,7 @@
+ 
+ object EventRepository {
+     // Shared active events list
+-    val activeEvents = mutableStateListOf(
+-        Event(id = 5, name = "Tech Workshop", date = "April 01", time = "10:00 AM", location = "Room 102", isActive = true),
+-        Event(id = 1, name = "Hackathon Kickoff", date = "March 30", time = "09:00 AM", location = "Main Hall", isActive = true),
+-        Event(id = 3, name = "Project Presentations", date = "March 31", time = "04:00 PM", location = "Auditorium", isActive = true),
+-        Event(id = 2, name = "Coding Sprint", date = "March 30", time = "01:00 PM", location = "Lab 101", isActive = true),
+-        Event(id = 6, name = "Networking Lunch", date = "April 01", time = "12:30 PM", location = "Cafeteria", isActive = true),
+-        Event(id = 4, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage", isActive = true),
+-        Event(id = 8, name = "Hackathon Judging", date = "April 02", time = "02:00 PM", location = "Lab 101", isActive = true),
+-        Event(id = 7, name = "Keynote Speech", date = "April 02", time = "09:30 AM", location = "Main Hall", isActive = true),
+-        Event(id = 9, name = "Closing Ceremony", date = "April 02", time = "05:00 PM", location = "Auditorium", isActive = true),
+-    )
++    val activeEvents = mutableStateListOf<Event>()
+ 
+     // Shared inactive events list (fetched from backend or added dynamically)
+     val inactiveEvents = mutableStateListOf<Event>()
+Index: Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport android.app.Activity\r\nimport android.content.Intent\r\nimport android.os.Bundle\r\nimport android.util.Log\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.width\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.ExperimentalMaterial3Api\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.OutlinedButton\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TextButton\r\nimport androidx.compose.material3.TopAppBar\r\nimport androidx.compose.material3.TopAppBarDefaults\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.runtime.rememberCoroutineScope\r\nimport androidx.compose.runtime.setValue\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.text.style.TextAlign\r\nimport androidx.compose.ui.tooling.preview.Devices\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.lifecycle.lifecycleScope\r\nimport com.example.hackathon_project.ui.theme.Hackathon_projectTheme\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.delay\r\nimport kotlinx.coroutines.launch\r\nimport kotlinx.coroutines.withContext\r\nimport org.json.JSONArray\r\nimport java.net.HttpURLConnection\r\nimport java.net.URL\r\n\r\nclass InactiveEventsActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        fetchEventFromFastApi()\r\n        setContent {\r\n            Hackathon_projectTheme {\r\n                Scaffold(modifier = Modifier.fillMaxSize()) { innerPanelPadding ->\r\n                    InactiveEventsContent(\r\n                        modifier = Modifier.padding(innerPanelPadding),\r\n                        onFetchClicked = { fetchEventFromFastApi() },\r\n                        onAddEvent = { event -> EventRepository.promoteToActive(event) },\r\n                        onDeleteEvent = { event -> EventRepository.removeInactive(event) }\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun fetchEventFromFastApi() {\r\n        lifecycleScope.launch(Dispatchers.IO) {\r\n            var connection: HttpURLConnection? = null\r\n            try {\r\n                val url = URL(\"http://26.29.51.138:8000/refresh\")\r\n                connection = url.openConnection() as HttpURLConnection\r\n                connection.requestMethod = \"GET\"\r\n                connection.connectTimeout = 600000\r\n                connection.readTimeout = 600000\r\n\r\n                val responseCode = connection.responseCode\r\n                val responseStream = if (responseCode in 200..299) {\r\n                    connection.inputStream\r\n                } else {\r\n                    connection.errorStream\r\n                }\r\n                val responseString = responseStream?.bufferedReader()?.use { it.readText() }.orEmpty()\r\n                Log.d(\"FastAPI_Response\", responseString)\r\n\r\n                if (responseCode != HttpURLConnection.HTTP_OK) {\r\n                    throw IllegalStateException(\"Backend returned HTTP $responseCode: $responseString\")\r\n                }\r\n\r\n                val eventArray = JSONArray(responseString)\r\n                val fetchedEvents = buildList {\r\n                    for (index in 0 until eventArray.length()) {\r\n                        val eventJson = eventArray.optJSONObject(index) ?: continue\r\n                        val title = eventJson.optString(\"title\").takeIf { it.isNotBlank() } ?: continue\r\n                        val start = eventJson.optString(\"start\")\r\n                        add(\r\n                            Event(\r\n                                name = title,\r\n                                date = if (start.length >= 10) start.substring(0, 10) else \"TBD\",\r\n                                time = if (start.length >= 16) start.substring(11, 16) else \"TBD\",\r\n                                location = eventJson.optString(\"location\", \"Unknown\"),\r\n                                isActive = false,\r\n                            )\r\n                        )\r\n                    }\r\n                }\r\n\r\n                withContext(Dispatchers.Main) {\r\n                    receiveEvents(fetchedEvents)\r\n                }\r\n            } catch (e: Exception) {\r\n                Log.e(\"FastAPI_Error\", \"Could not load events from backend\", e)\r\n            } finally {\r\n                connection?.disconnect()\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nfun receiveEvents(events: List<Event>) {\r\n    events.forEach { event ->\r\n        val key = \"${event.name}_${event.date}\"\r\n        val alreadyPresent = EventRepository.inactiveEvents.any { \"${it.name}_${it.date}\" == key }\r\n        val alreadyActive = EventRepository.activeEvents.any { \"${it.name}_${it.date}\" == key }\r\n        val alreadyDismissed = EventRepository.dismissedEvents.contains(key)\r\n\r\n        if (!alreadyPresent && !alreadyActive && !alreadyDismissed) {\r\n            val newId = (EventRepository.inactiveEvents.maxOfOrNull { it.id } ?: 100) + 1\r\n            EventRepository.inactiveEvents.add(event.copy(id = newId))\r\n        }\r\n    }\r\n}\r\n\r\n@OptIn(ExperimentalMaterial3Api::class)\r\n@Composable\r\nfun InactiveEventsContent(\r\n    modifier: Modifier = Modifier,\r\n    onFetchClicked: () -> Unit = {},\r\n    onAddEvent: (Event) -> Unit = {},\r\n    onDeleteEvent: (Event) -> Unit = {}\r\n) {\r\n    var isButtonEnabled by remember { mutableStateOf(true) }\r\n    val coroutineScope = rememberCoroutineScope()\r\n    val context = LocalContext.current\r\n    val activity = context as? Activity\r\n\r\n    Surface(\r\n        modifier = modifier.fillMaxSize(),\r\n        color = MaterialTheme.colorScheme.background,\r\n    ) {\r\n        Column(modifier = Modifier.fillMaxSize()) {\r\n            TopAppBar(\r\n                title = {\r\n                    Row(verticalAlignment = Alignment.CenterVertically) {\r\n                        Spacer(modifier = Modifier.width(16.dp))\r\n                        Text(\r\n                            text = \"Inactive Events (${EventRepository.inactiveEvents.size})\",\r\n                            style = MaterialTheme.typography.titleLarge,\r\n                            fontWeight = FontWeight.Bold\r\n                        )\r\n                    }\r\n                },\r\n                navigationIcon = {\r\n                    OutlinedButton(\r\n                        onClick = {\r\n                            val intent = Intent(context, HomeActivity::class.java)\r\n                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP\r\n                            context.startActivity(intent)\r\n                            activity?.finish()\r\n                        },\r\n                        modifier = Modifier.padding(start = 8.dp)\r\n                    ) {\r\n                        Text(\"Back to Home\")\r\n                    }\r\n                },\r\n                colors = TopAppBarDefaults.topAppBarColors(\r\n                    containerColor = MaterialTheme.colorScheme.background\r\n                )\r\n            )\r\n\r\n            Column(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(16.dp),\r\n                horizontalAlignment = Alignment.CenterHorizontally\r\n            ) {\r\n                Button(\r\n                    onClick = {\r\n                        if (isButtonEnabled) {\r\n                            isButtonEnabled = false\r\n                            onFetchClicked()\r\n                            coroutineScope.launch {\r\n                                delay(10000L) // 10 second cooldown\r\n                                isButtonEnabled = true\r\n                            }\r\n                        }\r\n                    },\r\n                    enabled = isButtonEnabled,\r\n                    modifier = Modifier.padding(bottom = 8.dp)\r\n                ) {\r\n                    Text(if (isButtonEnabled) \"Fetch New Posts\" else \"Please wait...\")\r\n                }\r\n            }\r\n\r\n            if (EventRepository.inactiveEvents.isEmpty()) {\r\n                Surface(\r\n                    modifier = Modifier\r\n                        .fillMaxSize()\r\n                        .padding(32.dp),\r\n                    color = MaterialTheme.colorScheme.background\r\n                ) {\r\n                    Text(\r\n                        text = \"No inactive events found. Tap 'Fetch New Posts' to load from backend.\",\r\n                        style = MaterialTheme.typography.bodyMedium,\r\n                        textAlign = TextAlign.Center,\r\n                        color = MaterialTheme.colorScheme.onSurfaceVariant,\r\n                    )\r\n                }\r\n            } else {\r\n                LazyColumn(\r\n                    modifier = Modifier.fillMaxSize(),\r\n                    contentPadding = PaddingValues(\r\n                        top = 8.dp,\r\n                        bottom = 16.dp,\r\n                        start = 16.dp,\r\n                        end = 16.dp\r\n                    ),\r\n                    verticalArrangement = Arrangement.spacedBy(12.dp),\r\n                ) {\r\n                    items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->\r\n                        InactiveEventCard(\r\n                            event = eventItem,\r\n                            onAdd = { onAddEvent(eventItem) },\r\n                            onDelete = { onDeleteEvent(eventItem) }\r\n                        )\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun InactiveEventCard(\r\n    event: Event,\r\n    onAdd: () -> Unit,\r\n    onDelete: () -> Unit,\r\n    modifier: Modifier = Modifier,\r\n) {\r\n    Card(\r\n        modifier = modifier.fillMaxWidth(),\r\n        colors = CardDefaults.cardColors(\r\n            containerColor = MaterialTheme.colorScheme.surfaceVariant,\r\n            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,\r\n        ),\r\n        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),\r\n    ) {\r\n        Row(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .padding(16.dp),\r\n            horizontalArrangement = Arrangement.SpaceBetween,\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            Column(modifier = Modifier.weight(1f)) {\r\n                Text(\r\n                    text = event.name,\r\n                    style = MaterialTheme.typography.titleMedium,\r\n                    fontWeight = FontWeight.Bold\r\n                )\r\n                Spacer(modifier = Modifier.height(4.dp))\r\n                Text(\r\n                    text = \"${event.date} at ${event.time}\",\r\n                    style = MaterialTheme.typography.bodyMedium\r\n                )\r\n                Spacer(modifier = Modifier.height(2.dp))\r\n                Text(\r\n                    text = \"\uD83D\uDCCD ${event.location} (Inactive)\",\r\n                    style = MaterialTheme.typography.bodySmall\r\n                )\r\n            }\r\n\r\n            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {\r\n                Button(onClick = onAdd) {\r\n                    Text(\"Add\")\r\n                }\r\n                TextButton(onClick = onDelete) {\r\n                    Text(\r\n                        text = \"Delete\",\r\n                        color = MaterialTheme.colorScheme.error\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)\r\n@Composable\r\nfun InactiveEventsPreview() {\r\n    Hackathon_projectTheme {\r\n        InactiveEventsContent()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(revision 763aa70e96c31c02060852972c05fb616f211a71)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(date 1791681587805)
+@@ -7,7 +7,9 @@
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
++import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
+ import androidx.compose.foundation.layout.Column
+ import androidx.compose.foundation.layout.PaddingValues
+ import androidx.compose.foundation.layout.Row
+@@ -103,12 +105,16 @@
+                         val eventJson = eventArray.optJSONObject(index) ?: continue
+                         val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
+                         val start = eventJson.optString("start")
++                        val description = eventJson.optString("description", "")
++                        val postUrl = eventJson.optString("image_url", eventJson.optString("post_url", ""))
+                         add(
+                             Event(
+                                 name = title,
+                                 date = if (start.length >= 10) start.substring(0, 10) else "TBD",
+                                 time = if (start.length >= 16) start.substring(11, 16) else "TBD",
+                                 location = eventJson.optString("location", "Unknown"),
++                                description = description,
++                                postUrl = postUrl,
+                                 isActive = false,
+                             )
+                         )
+@@ -150,103 +156,114 @@
+     onDeleteEvent: (Event) -> Unit = {}
+ ) {
+     var isButtonEnabled by remember { mutableStateOf(true) }
++    var selectedEvent by remember { mutableStateOf<Event?>(null) }
+     val coroutineScope = rememberCoroutineScope()
+     val context = LocalContext.current
+     val activity = context as? Activity
+ 
+-    Surface(
+-        modifier = modifier.fillMaxSize(),
+-        color = MaterialTheme.colorScheme.background,
+-    ) {
+-        Column(modifier = Modifier.fillMaxSize()) {
+-            TopAppBar(
+-                title = {
+-                    Row(verticalAlignment = Alignment.CenterVertically) {
+-                        Spacer(modifier = Modifier.width(16.dp))
+-                        Text(
+-                            text = "Inactive Events (${EventRepository.inactiveEvents.size})",
+-                            style = MaterialTheme.typography.titleLarge,
+-                            fontWeight = FontWeight.Bold
+-                        )
+-                    }
+-                },
+-                navigationIcon = {
+-                    OutlinedButton(
+-                        onClick = {
+-                            val intent = Intent(context, HomeActivity::class.java)
+-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+-                            context.startActivity(intent)
+-                            activity?.finish()
+-                        },
+-                        modifier = Modifier.padding(start = 8.dp)
+-                    ) {
+-                        Text("Back to Home")
+-                    }
+-                },
+-                colors = TopAppBarDefaults.topAppBarColors(
+-                    containerColor = MaterialTheme.colorScheme.background
+-                )
+-            )
++    Box(modifier = modifier.fillMaxSize()) {
++        Surface(
++            modifier = Modifier.fillMaxSize(),
++            color = MaterialTheme.colorScheme.background,
++        ) {
++            Column(modifier = Modifier.fillMaxSize()) {
++                TopAppBar(
++                    title = {
++                        Row(verticalAlignment = Alignment.CenterVertically) {
++                            Spacer(modifier = Modifier.width(16.dp))
++                            Text(
++                                text = "Inactive Events (${EventRepository.inactiveEvents.size})",
++                                style = MaterialTheme.typography.titleLarge,
++                                fontWeight = FontWeight.Bold
++                            )
++                        }
++                    },
++                    navigationIcon = {
++                        OutlinedButton(
++                            onClick = {
++                                val intent = Intent(context, HomeActivity::class.java)
++                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
++                                context.startActivity(intent)
++                                activity?.finish()
++                            },
++                            modifier = Modifier.padding(start = 8.dp)
++                        ) {
++                            Text("Back to Home")
++                        }
++                    },
++                    colors = TopAppBarDefaults.topAppBarColors(
++                        containerColor = MaterialTheme.colorScheme.background
++                    )
++                )
+ 
+-            Column(
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .padding(16.dp),
+-                horizontalAlignment = Alignment.CenterHorizontally
+-            ) {
+-                Button(
+-                    onClick = {
+-                        if (isButtonEnabled) {
+-                            isButtonEnabled = false
+-                            onFetchClicked()
+-                            coroutineScope.launch {
+-                                delay(10000L) // 10 second cooldown
+-                                isButtonEnabled = true
+-                            }
+-                        }
+-                    },
+-                    enabled = isButtonEnabled,
+-                    modifier = Modifier.padding(bottom = 8.dp)
+-                ) {
+-                    Text(if (isButtonEnabled) "Fetch New Posts" else "Please wait...")
+-                }
+-            }
++                Column(
++                    modifier = Modifier
++                        .fillMaxWidth()
++                        .padding(16.dp),
++                    horizontalAlignment = Alignment.CenterHorizontally
++                ) {
++                    Button(
++                        onClick = {
++                            if (isButtonEnabled) {
++                                isButtonEnabled = false
++                                onFetchClicked()
++                                coroutineScope.launch {
++                                    delay(10000L) // 10 second cooldown
++                                    isButtonEnabled = true
++                                }
++                            }
++                        },
++                        enabled = isButtonEnabled,
++                        modifier = Modifier.padding(bottom = 8.dp)
++                    ) {
++                        Text(if (isButtonEnabled) "Fetch New Posts" else "Please wait...")
++                    }
++                }
+ 
+-            if (EventRepository.inactiveEvents.isEmpty()) {
+-                Surface(
+-                    modifier = Modifier
+-                        .fillMaxSize()
+-                        .padding(32.dp),
+-                    color = MaterialTheme.colorScheme.background
+-                ) {
+-                    Text(
+-                        text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
+-                        style = MaterialTheme.typography.bodyMedium,
+-                        textAlign = TextAlign.Center,
+-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+-                    )
+-                }
+-            } else {
+-                LazyColumn(
+-                    modifier = Modifier.fillMaxSize(),
+-                    contentPadding = PaddingValues(
+-                        top = 8.dp,
+-                        bottom = 16.dp,
+-                        start = 16.dp,
+-                        end = 16.dp
+-                    ),
+-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+-                ) {
+-                    items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->
+-                        InactiveEventCard(
+-                            event = eventItem,
+-                            onAdd = { onAddEvent(eventItem) },
+-                            onDelete = { onDeleteEvent(eventItem) }
+-                        )
++                if (EventRepository.inactiveEvents.isEmpty()) {
++                    Surface(
++                        modifier = Modifier
++                            .fillMaxSize()
++                            .padding(32.dp),
++                        color = MaterialTheme.colorScheme.background
++                    ) {
++                        Text(
++                            text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
++                            style = MaterialTheme.typography.bodyMedium,
++                            textAlign = TextAlign.Center,
++                            color = MaterialTheme.colorScheme.onSurfaceVariant,
++                        )
++                    }
++                } else {
++                    LazyColumn(
++                        modifier = Modifier.fillMaxSize(),
++                        contentPadding = PaddingValues(
++                            top = 8.dp,
++                            bottom = 16.dp,
++                            start = 16.dp,
++                            end = 16.dp
++                        ),
++                        verticalArrangement = Arrangement.spacedBy(12.dp),
++                    ) {
++                        items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->
++                            InactiveEventCard(
++                                event = eventItem,
++                                onAdd = { onAddEvent(eventItem) },
++                                onDelete = { onDeleteEvent(eventItem) },
++                                onClick = { selectedEvent = eventItem }
++                            )
++                        }
+                     }
+                 }
+             }
+         }
++
++        if (selectedEvent != null) {
++            EventDetailDialog(
++                event = selectedEvent!!,
++                onDismiss = { selectedEvent = null }
++            )
++        }
+     }
+ }
+ 
+@@ -255,10 +272,13 @@
+     event: Event,
+     onAdd: () -> Unit,
+     onDelete: () -> Unit,
++    onClick: () -> Unit,
+     modifier: Modifier = Modifier,
+ ) {
+     Card(
+-        modifier = modifier.fillMaxWidth(),
++        modifier = modifier
++            .fillMaxWidth()
++            .clickable { onClick() },
+         colors = CardDefaults.cardColors(
+             containerColor = MaterialTheme.colorScheme.surfaceVariant,
+             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+Index: Frontend/app/src/main/java/com/example/hackathon_project/Event.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\n// Data class representing an event (supports mutable properties for database operations)\r\ndata class Event(\r\n    var id: Long = 0,\r\n    var name: String = \"\",\r\n    var date: String = \"\",\r\n    var time: String = \"\",\r\n    var location: String = \"\",\r\n    var isActive: Boolean = false,\r\n)\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/Event.kt b/Frontend/app/src/main/java/com/example/hackathon_project/Event.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/Event.kt	(revision 763aa70e96c31c02060852972c05fb616f211a71)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/Event.kt	(date 1791681197963)
+@@ -7,6 +7,7 @@
+     var date: String = "",
+     var time: String = "",
+     var location: String = "",
++    var description: String = "",
++    var postUrl: String = "",
+     var isActive: Boolean = false,
+ )
+-

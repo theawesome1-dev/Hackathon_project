@@ -9,11 +9,9 @@ import java.net.URL
 object ApiClient {
     // Change this to your computer's IP or cloud server URL
     private const val BASE_URL = "http://10.32.220.33:8000"
-    //10.32.220.33
-    //26.29.51.138
 
     // 1. Fetch Event Data (GET /data or /refresh)
-    suspend fun fetchLatestEvent(endpoint: String = "/data"): EventData? {
+    suspend fun fetchLatestEvent(endpoint: String = "/data"): Event? {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL$endpoint")
@@ -29,12 +27,23 @@ object ApiClient {
                     val title = json.optString("title", "Untitled")
                     val start = json.optString("start", "")
                     val location = json.optString("location", "Unknown")
+                    val description = json.optString("description", "")
+                    val postUrl = json.optString("image_url", json.optString("post_url", ""))
 
                     val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
                     val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
 
                     connection.disconnect()
-                    return@withContext EventData(title, date, time, location)
+                    return@withContext Event(
+                        id = System.currentTimeMillis(),
+                        name = title,
+                        date = date,
+                        time = time,
+                        location = location,
+                        description = description,
+                        postUrl = postUrl,
+                        isActive = false
+                    )
                 }
                 connection.disconnect()
             } catch (e: Exception) {
@@ -44,8 +53,8 @@ object ApiClient {
         }
     }
 
-    // 2. Send a List of Account Names to Backend (POST /update)
-    suspend fun sendAccounts(accountName : String): Boolean {
+    // 2. Send Account Names to Backend (POST /update)
+    suspend fun sendAccounts(accountNames: List<String>): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL/update")
@@ -57,8 +66,8 @@ object ApiClient {
                 connection.connectTimeout = 5000
                 connection.readTimeout = 5000
 
-                // Build JSON array string from List<String>
-                val jsonInputString = "{\"accounts\": $accountName}"
+                val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
+                val jsonInputString = "{\"accounts\": $jsonArrayString}"
 
                 connection.outputStream.use { os ->
                     val input = jsonInputString.toByteArray(Charsets.UTF_8)
@@ -75,11 +84,3 @@ object ApiClient {
         }
     }
 }
-
-// Simple data holder for network results
-data class EventData(
-    val title: String,
-    val date: String,
-    val time: String,
-    val location: String
-)
