@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.hackathon_project.ui.theme.InstagramAppGradient
+import com.example.hackathon_project.ui.theme.InstagramLightBackground
 
 @Composable
 fun VideoBackground(
@@ -14,6 +14,6 @@ fun VideoBackground(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(InstagramAppGradient)
+            .background(InstagramLightBackground)
     )
 }

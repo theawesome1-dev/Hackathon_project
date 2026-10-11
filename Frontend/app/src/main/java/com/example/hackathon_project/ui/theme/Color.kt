@@ -3,25 +3,43 @@ package com.example.hackathon_project.ui.theme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-val moss = Color(0xFF6E6E46)
-val darkBrown = Color(0xFF423626)
-val chocolate = Color(0xFF5D4641)
-
-val lightBrown = Color(0xFF7B614D)
-val beige = Color(0xFFBFB094)
-val brownGreen = Color(0xFF9E9470)
-
-val InstagramBlack = Color(0xFF18181B)
-val InstagramBlue = Color(0xFF3479E9)
+// Authentic Instagram Light Palette
+val InstagramBlack = Color(0xFF000000)
 val InstagramWhite = Color(0xFFFFFFFF)
-val InstagramGrey = Color(0xFF52525B)
-val InstagramMagenta = Color(0xFFDD2A7B)
+val InstagramLightBackground = Color(0xFFFAFAFA)
+val InstagramSurface = Color(0xFFFFFFFF)
+val InstagramSurfaceElevated = Color(0xFFF4F4F5)
+val InstagramCardBorder = Color(0xFFE4E4E7)
 
-val InstagramAppGradient = Brush.verticalGradient(
+val InstagramBlue = Color(0xFF0095F6)
+val InstagramBluePressed = Color(0xFF1877F2)
+val InstagramRed = Color(0xFFED4956)
+val InstagramGreen = Color(0xFF34C759)
+
+val InstagramTextPrimary = Color(0xFF0F0F12)
+val InstagramTextSecondary = Color(0xFF65676B)
+val InstagramTextMuted = Color(0xFF8E8E93)
+val InstagramDivider = Color(0xFFE4E4E7)
+
+val InstagramPink = Color(0xFFE1306C)
+val InstagramPurple = Color(0xFF833AB4)
+val InstagramOrange = Color(0xFFF77737)
+val InstagramYellow = Color(0xFFFCAF45)
+
+// Legacy compatibility mapping
+val moss = InstagramSurface
+val darkBrown = InstagramLightBackground
+val chocolate = InstagramCardBorder
+val lightBrown = InstagramTextSecondary
+val beige = InstagramTextPrimary
+val brownGreen = InstagramBlue
+
+// Vibrant Instagram Pink Gradient without any black at the bottom
+val InstagramPinkGradient = Brush.verticalGradient(
     colors = listOf(
-        Color(0xFF7C5295), // Medium muted purple
-        Color(0xFF9E5A78), // Medium muted magenta
-        Color(0xFFBD6B5B), // Medium muted coral
-        Color(0xFFC7824E)  // Medium muted amber
+        Color(0xFF833AB4), // Instagram Purple
+        Color(0xFFDD2A7B), // Instagram Pink / Magenta
+        Color(0xFFF77737), // Instagram Coral / Orange
+        Color(0xFFFCAF45)  // Instagram Warm Gold / Yellow (No Black at bottom!)
     )
 )
