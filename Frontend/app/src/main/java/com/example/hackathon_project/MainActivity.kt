@@ -77,7 +77,7 @@ private fun parseToChronologicalOrder(event: Event): String {
     val monthNum = monthMap[monthStr] ?: "01"
     val dayNum = dateParts.getOrNull(1)?.padStart(2, '0') ?: "01"
 
-    val timeParts = event.time.trim().uppercase().split(" ")
+    val timeParts = event.start.trim().uppercase().split(" ")
     val clock = timeParts.getOrNull(0) ?: "00:00"
     val ampm = timeParts.getOrNull(1) ?: "AM"
     val clockParts = clock.split(":")
@@ -197,7 +197,11 @@ fun EventList(
         if (selectedEvent != null) {
             EventDetailDialog(
                 event = selectedEvent!!,
-                onDismiss = { selectedEvent = null }
+                onDismiss = { selectedEvent = null },
+                onDelete = {
+                    EventRepository.activeEvents.remove(selectedEvent!!)
+                    selectedEvent = null
+                }
             )
         }
     }
@@ -235,7 +239,7 @@ fun EventCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${event.date} at ${event.time}",
+                    text = "${event.date} from ${event.start} to ${event.end}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(modifier = Modifier.height(2.dp))

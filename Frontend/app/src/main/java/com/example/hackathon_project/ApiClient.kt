@@ -54,7 +54,7 @@ object ApiClient {
     }
 
     // 2. Send one account to the backend (POST /update)
-    suspend fun sendAccount(accountName: String): Boolean {
+   
         return withContext(Dispatchers.IO) {
             try {
                 val url = URL("$BASE_URL/update")
