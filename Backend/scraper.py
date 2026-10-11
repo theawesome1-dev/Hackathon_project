@@ -111,7 +111,7 @@ def run_scraper(username: str = "nasa", max_records: int = 10) -> list[dict[str,
         run_input=build_run_input(
             username=username,
             max_records=max_records,
-            only_posts_newer_than=last_scraped_at,
+         #   only_posts_newer_than=last_scraped_at,
         )
     )
 

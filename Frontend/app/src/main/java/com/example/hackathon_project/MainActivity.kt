@@ -81,6 +81,33 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Helper function to convert event date/time to a sortable string (Soonest -> Latest)
+private fun parseToChronologicalOrder(event: Event): String {
+    val monthMap = mapOf(
+        "jan" to "01", "feb" to "02", "mar" to "03", "apr" to "04",
+        "may" to "05", "jun" to "06", "jul" to "07", "aug" to "08",
+        "sep" to "09", "oct" to "10", "nov" to "11", "dec" to "12"
+    )
+    val dateParts = event.date.trim().lowercase().split(" ")
+    val monthStr = dateParts.getOrNull(0)?.take(3) ?: "jan"
+    val monthNum = monthMap[monthStr] ?: "01"
+    val dayNum = dateParts.getOrNull(1)?.padStart(2, '0') ?: "01"
+
+    val timeParts = event.start.trim().uppercase().split(" ")
+    val clock = timeParts.getOrNull(0) ?: "00:00"
+    val ampm = timeParts.getOrNull(1) ?: "AM"
+    val clockParts = clock.split(":")
+    val rawHour = clockParts.getOrNull(0)?.toIntOrNull() ?: 0
+    val min = clockParts.getOrNull(1) ?: "00"
+
+    var hour = rawHour
+    if (ampm == "PM" && hour < 12) hour += 12
+    if (ampm == "AM" && hour == 12) hour = 0
+    val hourStr = hour.toString().padStart(2, '0')
+
+    return "$monthNum-$dayNum $hourStr:$min"
+}
+
 // List of active events to be displayed
 @Composable
 fun MyScreenContent(modifier: Modifier = Modifier) {
@@ -199,7 +226,11 @@ fun EventList(
         if (selectedEvent != null) {
             EventDetailDialog(
                 event = selectedEvent!!,
-                onDismiss = { selectedEvent = null }
+                onDismiss = { selectedEvent = null },
+                onDelete = {
+                    EventRepository.activeEvents.remove(selectedEvent!!)
+                    selectedEvent = null
+                }
             )
         }
     }
@@ -258,7 +289,7 @@ fun EventItem(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "${event.date} at ${event.time}",
+                text = "${event.date} from ${event.start} to ${event.end}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = InstagramTextSecondary
             )

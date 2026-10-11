@@ -26,18 +26,21 @@ object ApiClient {
 
                     val title = json.optString("title", "Untitled")
                     val start = json.optString("start", "")
-                    val end = json.optString("end", "")
+                    var end = json.optString("end", "")
                     val location = json.optString("location", "Unknown")
                     val description = json.optString("description", "")
                     val postUrl = json.optString("image_url", json.optString("post_url", ""))
+
+                    val date = if (start.length >= 10) start.substring(0, 10) else "TBD"
+                    val time = if (start.length >= 16) start.substring(11, 16) else "TBD"
 
                     connection.disconnect()
                     return@withContext Event(
                         id = System.currentTimeMillis(),
                         name = title,
-                        date = parseAmericanDate(start),
-                        startTime = parseAmericanTime(start),
-                        endTime = parseAmericanTime(end),
+                        date = date,
+                        start = start,
+                        end = end,
                         location = location,
                         description = description,
                         postUrl = postUrl,
@@ -52,11 +55,11 @@ object ApiClient {
         }
     }
 
-    // Overload for sending a single account name string
-    suspend fun sendAccounts(accountName: String): Boolean = sendAccounts(listOf(accountName))
-    suspend fun sendAccount(accountName: String): Boolean = sendAccounts(listOf(accountName))
-
     // 2. Send Account Names to Backend (POST /update)
+    suspend fun sendAccounts(accountName: String): Boolean {
+        return sendAccounts(listOf(accountName))
+    }
+
     suspend fun sendAccounts(accountNames: List<String>): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -66,8 +69,8 @@ object ApiClient {
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
                 connection.setRequestProperty("Accept", "application/json")
                 connection.doOutput = true
-                connection.connectTimeout = 5000
-                connection.readTimeout = 5000
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
 
                 val jsonArrayString = accountNames.joinToString(prefix = "[\"", separator = "\",\"", postfix = "\"]")
                 val jsonInputString = "{\"accounts\": $jsonArrayString}"
@@ -77,7 +80,13 @@ object ApiClient {
                     os.write(input, 0, input.size)
                 }
 
-                val success = connection.responseCode == HttpURLConnection.HTTP_OK
+                val responseCode = connection.responseCode
+                val success = responseCode in 200..299
+                if (!success) {
+                    val errorResponse = connection.errorStream?.bufferedReader()?.readText()
+                    println("sendAccounts HTTP $responseCode Error: $errorResponse")
+                }
+
                 connection.disconnect()
                 return@withContext success
             } catch (e: Exception) {
