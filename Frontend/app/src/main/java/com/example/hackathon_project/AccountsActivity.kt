@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,11 +23,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,9 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
 import kotlinx.coroutines.launch
-
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 class AccountsActivity : ComponentActivity() {
-    var count = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +78,34 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
     var account1 by remember { mutableStateOf("") }
     val context = LocalContext.current
     val cardList = remember { mutableStateListOf<String>() }
+    val scope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        val names = loadNames(context)
+        cardList.addAll(names)
+    }
+    fun addName(){
+        if (account1.isNotBlank() && account1 !in cardList) {
+            onSubmitAccounts(account1)
+            cardList.add(account1)
+            scope.launch {
+                saveNames(context, cardList)
+            }
+            account1 = ""
+        } else if (account1.isBlank()) {
+            Toast.makeText(
+                context,
+                "Please enter an account",
+                Toast.LENGTH_SHORT
+            ).show()
+        }else {
+            Toast.makeText(
+                context,
+                "Account already exists",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     Surface(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
@@ -108,7 +140,16 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                     value = account1,
                     onValueChange = { account1 = it },
                     label = { Text("Account Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            addName()
+                        }
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -126,11 +167,31 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
                             ),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
                                     text = itemText,
                                     style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f)
                                 )
+                                TextButton(
+                                    onClick = {
+                                        cardList.remove(itemText)
+                                        scope.launch {
+                                            saveNames(context, cardList)
+                                        }
+                                    }
+                                ) {
+                                    Text(
+                                        text = "Delete",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
                     }
@@ -139,17 +200,7 @@ fun AccountsContent(modifier: Modifier = Modifier, onSubmitAccounts: (String) ->
 
             Button(
                 onClick = {
-                    if (account1.isNotBlank()) {
-                        onSubmitAccounts(account1)
-                        cardList.add(account1)
-                        account1 = ""
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Please enter an account",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                   addName()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

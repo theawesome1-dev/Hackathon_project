@@ -1,0 +1,242 @@
+Index: Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.hackathon_project\r\n\r\nimport android.app.Activity\r\nimport android.content.Intent\r\nimport android.os.Bundle\r\nimport androidx.activity.ComponentActivity\r\nimport androidx.activity.compose.setContent\r\nimport androidx.activity.enableEdgeToEdge\r\nimport androidx.compose.foundation.background\r\nimport androidx.compose.foundation.layout.Arrangement\r\nimport androidx.compose.foundation.layout.Column\r\nimport androidx.compose.foundation.layout.PaddingValues\r\nimport androidx.compose.foundation.layout.Row\r\nimport androidx.compose.foundation.layout.Spacer\r\nimport androidx.compose.foundation.layout.fillMaxSize\r\nimport androidx.compose.foundation.layout.fillMaxWidth\r\nimport androidx.compose.foundation.layout.height\r\nimport androidx.compose.foundation.layout.padding\r\nimport androidx.compose.foundation.layout.width\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.items\r\nimport androidx.compose.material3.Button\r\nimport androidx.compose.material3.Card\r\nimport androidx.compose.material3.CardDefaults\r\nimport androidx.compose.material3.ExperimentalMaterial3Api\r\nimport androidx.compose.material3.MaterialTheme\r\nimport androidx.compose.material3.OutlinedButton\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.material3.Surface\r\nimport androidx.compose.material3.Text\r\nimport androidx.compose.material3.TopAppBar\r\nimport androidx.compose.material3.TopAppBarDefaults\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.mutableStateListOf\r\nimport androidx.compose.ui.Alignment\r\nimport androidx.compose.ui.Modifier\r\nimport androidx.compose.ui.graphics.Color\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.text.font.FontWeight\r\nimport androidx.compose.ui.tooling.preview.Devices\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.compose.ui.unit.dp\r\nimport androidx.lifecycle.lifecycleScope\r\nimport com.example.hackathon_project.ui.theme.Hackathon_projectTheme\r\nimport com.example.hackathon_project.ui.theme.InstagramAppGradient\r\nimport kotlinx.coroutines.launch\r\n\r\nval inactiveEventsList = mutableStateListOf(\r\n    Event(id = 101, name = \"Past Planning Meeting\", date = \"Feb 10\", time = \"10:00 AM\", location = \"Room 202\", isActive = false),\r\n    Event(id = 102, name = \"Old Workshop\", date = \"Feb 15\", time = \"02:00 PM\", location = \"Lab 5\", isActive = false),\r\n)\r\nimport kotlinx.coroutines.withContext\r\nimport org.json.JSONArray\r\nimport java.net.HttpURLConnection\r\nimport java.net.URL\r\nimport android.util.Log\r\n\r\nclass InactiveEventsActivity : ComponentActivity() {\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        enableEdgeToEdge()\r\n        fetchEventFromFastApi()\r\n        setContent {\r\n            Hackathon_projectTheme {\r\n                Scaffold(\r\n                    modifier = Modifier.fillMaxSize(),\r\n                    containerColor = Color.Transparent\r\n                ) { innerPanelPadding ->\r\n                    InactiveEventsContent(\r\n                        modifier = Modifier.padding(innerPanelPadding),\r\n                        onFetchClicked = { fetchEventFromFastApi() }\r\n                    )\r\n                }\r\n            }\r\n        }\r\n    }\r\n\r\n    private fun fetchEventFromFastApi() {\r\n        lifecycleScope.launch(Dispatchers.IO) {\r\n            var connection: HttpURLConnection? = null\r\n            try {\r\n                val url = URL(\"http://26.29.51.138:8000/refresh\")\r\n                connection = url.openConnection() as HttpURLConnection\r\n                connection.requestMethod = \"GET\"\r\n                connection.connectTimeout = 600000\r\n                connection.readTimeout = 600000\r\n\r\n                val responseCode = connection.responseCode\r\n                val responseStream = if (responseCode in 200..299) {\r\n                    connection.inputStream\r\n                } else {\r\n                    connection.errorStream\r\n                }\r\n                val responseString = responseStream?.bufferedReader()?.use { it.readText() }.orEmpty()\r\n                Log.d(\"FastAPI_Response\", responseString)\r\n\r\n                if (responseCode != HttpURLConnection.HTTP_OK) {\r\n                    throw IllegalStateException(\"Backend returned HTTP $responseCode: $responseString\")\r\n                }\r\n\r\n                val eventArray = JSONArray(responseString)\r\n                val fetchedEvents = buildList {\r\n                    for (index in 0 until eventArray.length()) {\r\n                        val eventJson = eventArray.optJSONObject(index) ?: continue\r\n                        val title = eventJson.optString(\"title\").takeIf { it.isNotBlank() } ?: continue\r\n                        val start = eventJson.optString(\"start\")\r\n                        add(\r\n                            Event(\r\n                                name = title,\r\n                                date = if (start.length >= 10) start.substring(0, 10) else \"TBD\",\r\n                                time = if (start.length >= 16) start.substring(11, 16) else \"TBD\",\r\n                                location = eventJson.optString(\"location\", \"Unknown\"),\r\n                                isActive = false,\r\n                            )\r\n                        )\r\n                    }\r\n                }\r\n\r\n                withContext(Dispatchers.Main) {\r\n                    receiveEvents(fetchedEvents)\r\n                }\r\n            } catch (e: Exception) {\r\n                Log.e(\"FastAPI_Error\", \"Could not load events from backend\", e)\r\n            } finally {\r\n                connection?.disconnect()\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\nfun receiveEvents(events: List<Event>) {\r\n    events.forEach { event ->\r\n        val key = \"${event.name}_${event.date}\"\r\n        val alreadyPresent = EventRepository.inactiveEvents.any { \"${it.name}_${it.date}\" == key }\r\n        val alreadyActive = EventRepository.activeEvents.any { \"${it.name}_${it.date}\" == key }\r\n        val alreadyDismissed = EventRepository.dismissedEvents.contains(key)\r\n\r\n        if (!alreadyPresent && !alreadyActive && !alreadyDismissed) {\r\n            val newId = (EventRepository.inactiveEvents.maxOfOrNull { it.id } ?: 100) + 1\r\n            EventRepository.inactiveEvents.add(event.copy(id = newId))\r\n        }\r\n    }\r\n}\r\n\r\n@OptIn(ExperimentalMaterial3Api::class)\r\n@Composable\r\nfun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> Unit = {}) {\r\n    val context = LocalContext.current\r\n    val activity = context as? Activity\r\n    val textColor = Color.White\r\n\r\n    Surface(\r\n        modifier = modifier\r\n            .fillMaxSize()\r\n            .background(InstagramAppGradient),\r\n        color = Color.Transparent,\r\n    ) {\r\n        Column(modifier = Modifier.fillMaxSize()) {\r\n            Column(\r\n                modifier = Modifier\r\n                    .fillMaxWidth()\r\n                    .padding(16.dp),\r\n                horizontalAlignment = Alignment.CenterHorizontally\r\n            ) {\r\n                Text(\r\n                    text = \"Inactive Events\",\r\n                    style = MaterialTheme.typography.headlineLarge,\r\n                    fontWeight = FontWeight.Bold,\r\n                    textAlign = TextAlign.Center,\r\n                    color = MaterialTheme.colorScheme.onBackground,\r\n                    modifier = Modifier.padding(bottom = 8.dp),\r\n                )\r\n                Button(\r\n                    onClick = {\r\n                        if (isButtonEnabled) {\r\n                            isButtonEnabled = false\r\n                            onFetchClicked()\r\n                            coroutineScope.launch {\r\n                                delay(10000) // 10 second cooldown\r\n                                isButtonEnabled = true\r\n                            }\r\n                        }\r\n                    },\r\n                    enabled = isButtonEnabled,\r\n                    modifier = Modifier.padding(bottom = 8.dp)\r\n                ) {\r\n                    Text(if (isButtonEnabled) \"Fetch New Posts\" else \"Please wait...\")\r\n                }\r\n            }\r\n\r\n            if (EventRepository.inactiveEvents.isEmpty()) {\r\n                Surface(\r\n                    modifier = Modifier\r\n                        .fillMaxSize()\r\n                        .padding(32.dp),\r\n                    color = MaterialTheme.colorScheme.background\r\n                ) {\r\n                    Text(\r\n                        text = \"No inactive events found. Tap fetch to load new posts from backend.\",\r\n                        style = MaterialTheme.typography.bodyMedium,\r\n                        textAlign = TextAlign.Center,\r\n                        color = MaterialTheme.colorScheme.onSurfaceVariant,\r\n                    )\r\n                }\r\n            } else {\r\n                LazyColumn(\r\n                    modifier = Modifier.fillMaxSize(),\r\n                    contentPadding = PaddingValues(\r\n                        top = 8.dp,\r\n                        bottom = 16.dp,\r\n                        start = 16.dp,\r\n                        end = 16.dp\r\n                    ),\r\n                    verticalArrangement = Arrangement.spacedBy(12.dp),\r\n                ) {\r\n                    items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->\r\n                        InactiveEventCard(\r\n                            event = eventItem,\r\n                            onAdd = { onAddEvent(eventItem) },\r\n                            onDelete = { onDeleteEvent(eventItem) }\r\n                        )\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Composable\r\nfun InactiveEventCard(\r\n    event: Event,\r\n    onAdd: () -> Unit,\r\n    onDelete: () -> Unit,\r\n    modifier: Modifier = Modifier,\r\n) {\r\n    Card(\r\n        modifier = modifier.fillMaxWidth(),\r\n        colors = CardDefaults.cardColors(\r\n            containerColor = MaterialTheme.colorScheme.surfaceVariant,\r\n            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,\r\n        ),\r\n        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),\r\n    ) {\r\n        Row(\r\n            modifier = Modifier\r\n                .fillMaxWidth()\r\n                .padding(16.dp),\r\n            horizontalArrangement = Arrangement.SpaceBetween,\r\n            verticalAlignment = Alignment.CenterVertically\r\n        ) {\r\n            Column(modifier = Modifier.weight(1f)) {\r\n                Text(\r\n                    text = event.name,\r\n                    style = MaterialTheme.typography.titleMedium,\r\n                    fontWeight = FontWeight.Bold\r\n                )\r\n                Spacer(modifier = Modifier.height(4.dp))\r\n                Text(\r\n                    text = \"${event.date} at ${event.time}\",\r\n                    style = MaterialTheme.typography.bodyMedium\r\n                )\r\n                Spacer(modifier = Modifier.height(2.dp))\r\n                Text(\r\n                    text = \"\uD83D\uDCCD ${event.location} (Inactive)\",\r\n                    style = MaterialTheme.typography.bodySmall\r\n                )\r\n            }\r\n\r\n            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {\r\n                Button(onClick = onAdd) {\r\n                    Text(\"Add\")\r\n                }\r\n                TextButton(onClick = onDelete) {\r\n                    Text(\r\n                        text = \"Delete\",\r\n                        color = MaterialTheme.colorScheme.error\r\n                    )\r\n            TopAppBar(\r\n                title = {\r\n                    Row(verticalAlignment = Alignment.CenterVertically) {\r\n                        Spacer(modifier = Modifier.width(16.dp))\r\n                        Text(\r\n                            text = \"Inactive Events (${inactiveEventsList.size})\",\r\n                            style = MaterialTheme.typography.titleLarge,\r\n                            fontWeight = FontWeight.Bold,\r\n                            color = textColor\r\n                        )\r\n                    }\r\n                },\r\n                navigationIcon = {\r\n                    OutlinedButton(\r\n                        onClick = {\r\n                            val intent = Intent(context, HomeActivity::class.java)\r\n                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP\r\n                            context.startActivity(intent)\r\n                            activity?.finish()\r\n                        },\r\n                        modifier = Modifier.padding(start = 8.dp)\r\n                    ) {\r\n                        Text(\"Back to Home\", color = textColor)\r\n                    }\r\n                },\r\n                colors = TopAppBarDefaults.topAppBarColors(\r\n                    containerColor = Color.Transparent,\r\n                    titleContentColor = textColor\r\n                )\r\n            )\r\n\r\n            LazyColumn(\r\n                modifier = Modifier.fillMaxSize(),\r\n                contentPadding = PaddingValues(16.dp),\r\n                verticalArrangement = Arrangement.spacedBy(12.dp),\r\n            ) {\r\n                item {\r\n                    Column(\r\n                        modifier = Modifier.fillMaxWidth(),\r\n                        horizontalAlignment = Alignment.CenterHorizontally,\r\n                    ) {\r\n                        Button(\r\n                            onClick = onFetchClicked,\r\n                            modifier = Modifier.padding(bottom = 8.dp)\r\n                        ) {\r\n                            Text(\"Fetch Latest Event from Backend\")\r\n                        }\r\n                    }\r\n                }\r\n                items(inactiveEventsList, key = { it.id }) { eventItem ->\r\n                    Card(\r\n                        modifier = Modifier.fillMaxWidth(),\r\n                        colors = CardDefaults.cardColors(\r\n                            containerColor = MaterialTheme.colorScheme.surfaceVariant,\r\n                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,\r\n                        ),\r\n                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),\r\n                    ) {\r\n                        Column(modifier = Modifier.padding(16.dp)) {\r\n                            Text(\r\n                                text = eventItem.name,\r\n                                style = MaterialTheme.typography.titleMedium,\r\n                                fontWeight = FontWeight.Bold\r\n                            )\r\n                            Spacer(modifier = Modifier.height(4.dp))\r\n                            Text(\r\n                                text = \"${eventItem.date} at ${eventItem.time}\",\r\n                                style = MaterialTheme.typography.bodyMedium,\r\n                            )\r\n                            Spacer(modifier = Modifier.height(2.dp))\r\n                            Text(\r\n                                text = \"\uD83D\uDCCD ${eventItem.location} (Inactive)\",\r\n                                style = MaterialTheme.typography.bodySmall,\r\n                            )\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}\r\n\r\n@Preview(showBackground = true, showSystemUi = true, device = Devices.PHONE)\r\n@Composable\r\nfun InactiveEventsPreview() {\r\n    Hackathon_projectTheme {\r\n        InactiveEventsContent()\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt
+--- a/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(revision 2344e6832661592f8b8dab57664aadd27d0989e9)
++++ b/Frontend/app/src/main/java/com/example/hackathon_project/InactiveEventsActivity.kt	(date 1791678178892)
+@@ -3,6 +3,7 @@
+ import android.app.Activity
+ import android.content.Intent
+ import android.os.Bundle
++import android.util.Log
+ import androidx.activity.ComponentActivity
+ import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+@@ -28,32 +29,33 @@
+ import androidx.compose.material3.Scaffold
+ import androidx.compose.material3.Surface
+ import androidx.compose.material3.Text
++import androidx.compose.material3.TextButton
+ import androidx.compose.material3.TopAppBar
+ import androidx.compose.material3.TopAppBarDefaults
+ import androidx.compose.runtime.Composable
+-import androidx.compose.runtime.mutableStateListOf
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.runtime.setValue
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.text.style.TextAlign
+ import androidx.compose.ui.tooling.preview.Devices
+ import androidx.compose.ui.tooling.preview.Preview
+ import androidx.compose.ui.unit.dp
+ import androidx.lifecycle.lifecycleScope
+ import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+-import com.example.hackathon_project.ui.theme.InstagramAppGradient
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.delay
+ import kotlinx.coroutines.launch
+-
+-val inactiveEventsList = mutableStateListOf(
+-    Event(id = 101, name = "Past Planning Meeting", date = "Feb 10", time = "10:00 AM", location = "Room 202", isActive = false),
+-    Event(id = 102, name = "Old Workshop", date = "Feb 15", time = "02:00 PM", location = "Lab 5", isActive = false),
+-)
+ import kotlinx.coroutines.withContext
+ import org.json.JSONArray
+ import java.net.HttpURLConnection
+ import java.net.URL
+-import android.util.Log
+ 
+ class InactiveEventsActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+@@ -62,13 +64,12 @@
+         fetchEventFromFastApi()
+         setContent {
+             Hackathon_projectTheme {
+-                Scaffold(
+-                    modifier = Modifier.fillMaxSize(),
+-                    containerColor = Color.Transparent
+-                ) { innerPanelPadding ->
++                Scaffold(modifier = Modifier.fillMaxSize()) { innerPanelPadding ->
+                     InactiveEventsContent(
+                         modifier = Modifier.padding(innerPanelPadding),
+-                        onFetchClicked = { fetchEventFromFastApi() }
++                        onFetchClicked = { fetchEventFromFastApi() },
++                        onAddEvent = { event -> EventRepository.promoteToActive(event) },
++                        onDeleteEvent = { event -> EventRepository.removeInactive(event) }
+                     )
+                 }
+             }
+@@ -144,32 +145,57 @@
+ 
+ @OptIn(ExperimentalMaterial3Api::class)
+ @Composable
+-fun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> Unit = {}) {
++fun InactiveEventsContent(
++    modifier: Modifier = Modifier,
++    onFetchClicked: () -> Unit = {},
++    onAddEvent: (Event) -> Unit = {},
++    onDeleteEvent: (Event) -> Unit = {}
++) {
++    var isButtonEnabled by remember { mutableStateOf(true) }
++    val coroutineScope = rememberCoroutineScope()
+     val context = LocalContext.current
+     val activity = context as? Activity
+-    val textColor = Color.White
+ 
+     Surface(
+-        modifier = modifier
+-            .fillMaxSize()
+-            .background(InstagramAppGradient),
+-        color = Color.Transparent,
++        modifier = modifier.fillMaxSize(),
++        color = MaterialTheme.colorScheme.background,
+     ) {
+         Column(modifier = Modifier.fillMaxSize()) {
++            TopAppBar(
++                title = {
++                    Row(verticalAlignment = Alignment.CenterVertically) {
++                        Spacer(modifier = Modifier.width(16.dp))
++                        Text(
++                            text = "Inactive Events (${EventRepository.inactiveEvents.size})",
++                            style = MaterialTheme.typography.titleLarge,
++                            fontWeight = FontWeight.Bold
++                        )
++                    }
++                },
++                navigationIcon = {
++                    OutlinedButton(
++                        onClick = {
++                            val intent = Intent(context, HomeActivity::class.java)
++                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
++                            context.startActivity(intent)
++                            activity?.finish()
++                        },
++                        modifier = Modifier.padding(start = 8.dp)
++                    ) {
++                        Text("Back to Home")
++                    }
++                },
++                colors = TopAppBarDefaults.topAppBarColors(
++                    containerColor = MaterialTheme.colorScheme.background
++                )
++            )
++
+             Column(
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(16.dp),
+                 horizontalAlignment = Alignment.CenterHorizontally
+             ) {
+-                Text(
+-                    text = "Inactive Events",
+-                    style = MaterialTheme.typography.headlineLarge,
+-                    fontWeight = FontWeight.Bold,
+-                    textAlign = TextAlign.Center,
+-                    color = MaterialTheme.colorScheme.onBackground,
+-                    modifier = Modifier.padding(bottom = 8.dp),
+-                )
+                 Button(
+                     onClick = {
+                         if (isButtonEnabled) {
+@@ -196,7 +222,7 @@
+                     color = MaterialTheme.colorScheme.background
+                 ) {
+                     Text(
+-                        text = "No inactive events found. Tap fetch to load new posts from backend.",
++                        text = "No inactive events found. Tap 'Fetch New Posts' to load from backend.",
+                         style = MaterialTheme.typography.bodyMedium,
+                         textAlign = TextAlign.Center,
+                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+@@ -275,82 +301,6 @@
+                         text = "Delete",
+                         color = MaterialTheme.colorScheme.error
+                     )
+-            TopAppBar(
+-                title = {
+-                    Row(verticalAlignment = Alignment.CenterVertically) {
+-                        Spacer(modifier = Modifier.width(16.dp))
+-                        Text(
+-                            text = "Inactive Events (${inactiveEventsList.size})",
+-                            style = MaterialTheme.typography.titleLarge,
+-                            fontWeight = FontWeight.Bold,
+-                            color = textColor
+-                        )
+-                    }
+-                },
+-                navigationIcon = {
+-                    OutlinedButton(
+-                        onClick = {
+-                            val intent = Intent(context, HomeActivity::class.java)
+-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+-                            context.startActivity(intent)
+-                            activity?.finish()
+-                        },
+-                        modifier = Modifier.padding(start = 8.dp)
+-                    ) {
+-                        Text("Back to Home", color = textColor)
+-                    }
+-                },
+-                colors = TopAppBarDefaults.topAppBarColors(
+-                    containerColor = Color.Transparent,
+-                    titleContentColor = textColor
+-                )
+-            )
+-
+-            LazyColumn(
+-                modifier = Modifier.fillMaxSize(),
+-                contentPadding = PaddingValues(16.dp),
+-                verticalArrangement = Arrangement.spacedBy(12.dp),
+-            ) {
+-                item {
+-                    Column(
+-                        modifier = Modifier.fillMaxWidth(),
+-                        horizontalAlignment = Alignment.CenterHorizontally,
+-                    ) {
+-                        Button(
+-                            onClick = onFetchClicked,
+-                            modifier = Modifier.padding(bottom = 8.dp)
+-                        ) {
+-                            Text("Fetch Latest Event from Backend")
+-                        }
+-                    }
+-                }
+-                items(inactiveEventsList, key = { it.id }) { eventItem ->
+-                    Card(
+-                        modifier = Modifier.fillMaxWidth(),
+-                        colors = CardDefaults.cardColors(
+-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+-                        ),
+-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+-                    ) {
+-                        Column(modifier = Modifier.padding(16.dp)) {
+-                            Text(
+-                                text = eventItem.name,
+-                                style = MaterialTheme.typography.titleMedium,
+-                                fontWeight = FontWeight.Bold
+-                            )
+-                            Spacer(modifier = Modifier.height(4.dp))
+-                            Text(
+-                                text = "${eventItem.date} at ${eventItem.time}",
+-                                style = MaterialTheme.typography.bodyMedium,
+-                            )
+-                            Spacer(modifier = Modifier.height(2.dp))
+-                            Text(
+-                                text = "📍 ${eventItem.location} (Inactive)",
+-                                style = MaterialTheme.typography.bodySmall,
+-                            )
+-                        }
+-                    }
+                 }
+             }
+         }
