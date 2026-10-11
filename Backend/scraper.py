@@ -3,7 +3,6 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +10,6 @@ from apify_client import ApifyClient
 
 
 ACTOR_ID = "shu8hvrXbJbY3Eb9W"
-SCRAPE_STATE_FILE = "scrape_state.json"
 
 
 def load_env_file() -> None:
@@ -30,31 +28,13 @@ def load_env_file() -> None:
 
 def build_run_input(
     username: str = "nasa",
-    max_records: int = 10,
-    only_posts_newer_than: str | None = None,
 ) -> dict[str, Any]:
-    run_input: dict[str, Any] = {
+    return {
         "resultsType": "posts",
         "directUrls": [f"https://www.instagram.com/{username.strip('@')}/"],
-        "resultsLimit": max_records,
+        "resultsLimit": 1,
         "addParentData": False,
     }
-    if only_posts_newer_than:
-        run_input["onlyPostsNewerThan"] = only_posts_newer_than
-    return run_input
-
-
-def load_scrape_state(state_path: Path) -> dict[str, str]:
-    if not state_path.exists():
-        return {}
-    state = json.loads(state_path.read_text(encoding="utf-8"))
-    if not isinstance(state, dict):
-        raise ValueError(f"Scrape state must be a JSON object: {state_path}")
-    return state
-
-
-def save_scrape_state(state_path: Path, state: dict[str, str]) -> None:
-    state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def extract_post_fields(items: list[dict[str, Any]]) -> list[dict[str, str | None]]:
@@ -91,28 +71,15 @@ def extract_post_fields(items: list[dict[str, Any]]) -> list[dict[str, str | Non
     return extracted
 
 
-def run_scraper(username: str = "nasa", max_records: int = 10) -> list[dict[str, str | None]]:
-    if max_records < 1:
-        raise ValueError("max_records must be at least 1.")
-
+def run_scraper(username: str = "nasa") -> list[dict[str, str | None]]:
     load_env_file()
     api_token = os.getenv("APIFY_API_TOKEN")
     if not api_token:
         raise RuntimeError("Set the APIFY_API_TOKEN environment variable before running the scraper.")
 
-    state_path = Path(__file__).with_name(SCRAPE_STATE_FILE)
-    scrape_state = load_scrape_state(state_path)
-    state_key = username.strip().lstrip("@").casefold()
-    last_scraped_at = scrape_state.get(state_key)
-    scrape_started_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
-
     client = ApifyClient(api_token)
     run = client.actor(ACTOR_ID).call(
-        run_input=build_run_input(
-            username=username,
-            max_records=max_records,
-         #   only_posts_newer_than=last_scraped_at,
-        )
+        run_input=build_run_input(username=username)
     )
 
     dataset_id = getattr(run, "default_dataset_id", None)
@@ -120,16 +87,12 @@ def run_scraper(username: str = "nasa", max_records: int = 10) -> list[dict[str,
         raise RuntimeError(f"Actor run did not return a dataset ID: {run.model_dump()}")
 
     raw_items = list(client.dataset(dataset_id).iterate_items())
-    results = extract_post_fields(raw_items)
-    scrape_state[state_key] = scrape_started_at
-    save_scrape_state(state_path, scrape_state)
-    return results
+    return extract_post_fields(raw_items)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the Instagram scraper actor for a username or a list of usernames from accounts.txt.")
     parser.add_argument("--username", default=None, help="Instagram username to scrape.")
-    parser.add_argument("--max-records", type=int, default=10, help="Maximum posts to fetch per user.")
     parser.add_argument("--accounts-file", default="accounts.txt", help="Text file with one Instagram username per line.")
     return parser.parse_args()
 
@@ -159,10 +122,7 @@ def main() -> None:
         for index, username in enumerate(usernames, start=1):
             print(f"Running scraper for '{username}' ({index}/{len(usernames)})...")
             try:
-                results = run_scraper(
-                    username=username,
-                    max_records=args.max_records,
-                )
+                results = run_scraper(username=username)
                 print(f"Found {len(results)} result(s) for {username}")
                 for item in results:
                     item_with_username = {"username": username, **item}
