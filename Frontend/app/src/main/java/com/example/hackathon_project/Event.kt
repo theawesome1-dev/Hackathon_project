@@ -7,6 +7,7 @@ data class Event(
     var date: String = "",
     var time: String = "",
     var location: String = "",
+    var description: String = "",
+    var postUrl: String = "",
     var isActive: Boolean = false,
 )
-
