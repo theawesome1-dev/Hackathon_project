@@ -6,7 +6,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -33,12 +36,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.hackathon_project.ui.theme.Hackathon_projectTheme
+import com.example.hackathon_project.ui.theme.InstagramAppGradient
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +51,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Hackathon_projectTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = Color.Transparent
+                ) { innerPadding ->
                     MyScreenContent(modifier = Modifier.padding(innerPadding))
                 }
             }
@@ -84,16 +92,35 @@ private fun parseToChronologicalOrder(event: Event): String {
 // List of active events to be displayed
 @Composable
 fun MyScreenContent(modifier: Modifier = Modifier) {
+    val sampleEvents = listOf(
+        Event(id = 5, name = "Tech Workshop", date = "April 01", time = "10:00 AM", location = "Room 102", isActive = true),
+        Event(id = 1, name = "Hackathon Kickoff", date = "March 30", time = "09:00 AM", location = "Main Hall", isActive = true),
+        Event(id = 3, name = "Project Presentations", date = "March 31", time = "04:00 PM", location = "Auditorium", isActive = true),
+        Event(id = 2, name = "Coding Sprint", date = "March 30", time = "01:00 PM", location = "Lab 101", isActive = true),
+        Event(id = 6, name = "Networking Lunch", date = "April 01", time = "12:30 PM", location = "Cafeteria", isActive = true),
+        Event(id = 4, name = "Awards Ceremony", date = "March 31", time = "06:00 PM", location = "Main Stage", isActive = true),
+        Event(id = 8, name = "Hackathon Judging", date = "April 02", time = "02:00 PM", location = "Lab 101", isActive = true),
+        Event(id = 7, name = "Keynote Speech", date = "April 02", time = "09:30 AM", location = "Main Hall", isActive = true),
+        Event(id = 9, name = "Closing Ceremony", date = "April 02", time = "05:00 PM", location = "Auditorium", isActive = true),
+    )
+
+    // Observable state list sorted chronologically from soonest to latest
+    val events = remember {
+        mutableStateListOf<Event>().apply {
+            addAll(sampleEvents.sortedBy { parseToChronologicalOrder(it) })
+        }
+    }
+
     EventList(
-        events = EventRepository.activeEvents,
+        events = events,
         onDeleteEvent = { eventToDelete ->
-            EventRepository.activeEvents.remove(eventToDelete)
+            events.remove(eventToDelete)
         },
         modifier = modifier
     )
 }
 
-// Formats the column of events
+// Formats the column of events with looping background video
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventList(
@@ -104,66 +131,80 @@ fun EventList(
     val context = LocalContext.current
     val activity = context as? Activity
 
-    Surface(
-        modifier = modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(InstagramAppGradient)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "    Active Events (${events.size})",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    OutlinedButton(
-                        onClick = {
-                            val intent = Intent(context, HomeActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            context.startActivity(intent)
-                            activity?.finish()
-                        },
-                        modifier = Modifier.padding(start = 11.dp)
-                    ) {
-                        Text("Back to Home")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
+        // Continuous looping animated video background (prioritized over background colors)
+        VideoBackground()
 
-            if (events.isEmpty()) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Text(
-                        text = "No active events remaining.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Transparent
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                TopAppBar(
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = "Active Events (${events.size})",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(context, HomeActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                context.startActivity(intent)
+                                activity?.finish()
+                            },
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text("Back to Home", color = Color.White)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White
                     )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        top = 8.dp,
-                        bottom = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(events, key = { it.id }) { event ->
-                        EventCard(
-                            event = event,
-                            onDelete = { onDeleteEvent(event) }
+                )
+
+                if (events.isEmpty()) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        color = Color.Transparent
+                    ) {
+                        Text(
+                            text = "No active events remaining.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White
                         )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = 8.dp,
+                            bottom = 16.dp,
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(events, key = { it.id }) { event ->
+                            EventCard(
+                                event = event,
+                                onDelete = { onDeleteEvent(event) }
+                            )
+                        }
                     }
                 }
             }
@@ -180,7 +221,7 @@ fun EventCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -216,7 +257,7 @@ fun EventCard(
             ) {
                 Text(
                     text = "Delete",
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

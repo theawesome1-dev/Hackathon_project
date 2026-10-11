@@ -10,11 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,11 +52,16 @@ import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Log
 
+// Shared mutable state list so receiveEvent can add items and Compose UI reacts to updates
+val inactiveEventsList = mutableStateListOf(
+    Event(id = 101, name = "Past Planning Meeting", date = "Feb 10", time = "10:00 AM", location = "Room 202", isActive = false),
+    Event(id = 102, name = "Old Workshop", date = "Feb 15", time = "02:00 PM", location = "Lab 5", isActive = false),
+)
+
 class InactiveEventsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        fetchEventFromFastApi()
         setContent {
             Hackathon_projectTheme {
                 Scaffold(
@@ -76,70 +78,24 @@ class InactiveEventsActivity : ComponentActivity() {
     }
 
     private fun fetchEventFromFastApi() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            var connection: HttpURLConnection? = null
-            try {
-                val url = URL("http://26.29.51.138:8000/refresh")
-                connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 600000
-                connection.readTimeout = 600000
-
-                val responseCode = connection.responseCode
-                val responseStream = if (responseCode in 200..299) {
-                    connection.inputStream
-                } else {
-                    connection.errorStream
-                }
-                val responseString = responseStream?.bufferedReader()?.use { it.readText() }.orEmpty()
-                Log.d("FastAPI_Response", responseString)
-
-                if (responseCode != HttpURLConnection.HTTP_OK) {
-                    throw IllegalStateException("Backend returned HTTP $responseCode: $responseString")
-                }
-
-                val eventArray = JSONArray(responseString)
-                val fetchedEvents = buildList {
-                    for (index in 0 until eventArray.length()) {
-                        val eventJson = eventArray.optJSONObject(index) ?: continue
-                        val title = eventJson.optString("title").takeIf { it.isNotBlank() } ?: continue
-                        val start = eventJson.optString("start")
-                        add(
-                            Event(
-                                name = title,
-                                date = if (start.length >= 10) start.substring(0, 10) else "TBD",
-                                time = if (start.length >= 16) start.substring(11, 16) else "TBD",
-                                location = eventJson.optString("location", "Unknown"),
-                                isActive = false,
-                            )
-                        )
-                    }
-                }
-
-                withContext(Dispatchers.Main) {
-                    receiveEvents(fetchedEvents)
-                }
-            } catch (e: Exception) {
-                Log.e("FastAPI_Error", "Could not load events from backend", e)
-            } finally {
-                connection?.disconnect()
+        lifecycleScope.launch {
+            // Uses ApiClient to fetch from backend cleanly
+            val eventData = ApiClient.fetchLatestEvent("/refresh")
+            if (eventData != null) {
+                receiveEvent(
+                    name = eventData.title,
+                    date = eventData.date,
+                    time = eventData.time,
+                    location = eventData.location
+                )
             }
         }
     }
 }
 
-fun receiveEvents(events: List<Event>) {
-    events.forEach { event ->
-        val key = "${event.name}_${event.date}"
-        val alreadyPresent = EventRepository.inactiveEvents.any { "${it.name}_${it.date}" == key }
-        val alreadyActive = EventRepository.activeEvents.any { "${it.name}_${it.date}" == key }
-        val alreadyDismissed = EventRepository.dismissedEvents.contains(key)
-
-        if (!alreadyPresent && !alreadyActive && !alreadyDismissed) {
-            val newId = (EventRepository.inactiveEvents.maxOfOrNull { it.id } ?: 100) + 1
-            EventRepository.inactiveEvents.add(event.copy(id = newId))
-        }
-    }
+fun receiveEvent(name: String, date: String, time: String, location: String) {
+    val newId = (inactiveEventsList.maxOfOrNull { it.id } ?: 100) + 1
+    inactiveEventsList.add(Event(id = newId, name = name, date = date, time = time, location = location, isActive = false))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,126 +105,62 @@ fun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> U
     val activity = context as? Activity
     val textColor = Color.White
 
+fun InactiveEventsContent(modifier: Modifier = Modifier, onFetchClicked: () -> Unit = {}) {
     Surface(
         modifier = modifier
             .fillMaxSize()
             .background(InstagramAppGradient),
         color = Color.Transparent,
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Inactive Events",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                )
-                Button(
-                    onClick = {
-                        if (isButtonEnabled) {
-                            isButtonEnabled = false
-                            onFetchClicked()
-                            coroutineScope.launch {
-                                delay(10000) // 10 second cooldown
-                                isButtonEnabled = true
-                            }
-                        }
-                    },
-                    enabled = isButtonEnabled,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                ) {
-                    Text(if (isButtonEnabled) "Fetch New Posts" else "Please wait...")
-                }
-            }
-
-            if (EventRepository.inactiveEvents.isEmpty()) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    color = MaterialTheme.colorScheme.background
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No inactive events found. Tap fetch to load new posts from backend.",
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = "Inactive Events",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(bottom = 8.dp),
                     )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        top = 8.dp,
-                        bottom = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    items(EventRepository.inactiveEvents, key = { it.id }) { eventItem ->
-                        InactiveEventCard(
-                            event = eventItem,
-                            onAdd = { onAddEvent(eventItem) },
-                            onDelete = { onDeleteEvent(eventItem) }
-                        )
+                    Button(
+                        onClick = onFetchClicked,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    ) {
+                        Text("Fetch Latest Event from Backend")
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun InactiveEventCard(
-    event: Event,
-    onAdd: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = event.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${event.date} at ${event.time}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "📍 ${event.location} (Inactive)",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onAdd) {
-                    Text("Add")
+            items(inactiveEventsList, key = { it.id }) { eventItem ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = eventItem.name,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        Text(
+                            text = "${eventItem.date} at ${eventItem.time}",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = "📍 ${eventItem.location} (Inactive)",
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
                 TextButton(onClick = onDelete) {
                     Text(
